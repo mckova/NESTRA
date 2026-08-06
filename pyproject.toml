@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nestra-ai"
+version = "2.0.0"
+description = "An evidence-aware Python gateway that routes between zero-token retrieval and accuracy-guarded LLM tiers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "NESTRA contributors" }]
+keywords = ["ai-gateway", "rag", "retrieval", "llm", "machine-learning", "guardrails"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "pytest-cov>=5",
+  "build>=1",
+  "jsonschema>=4",
+  "pyyaml>=6",
+  "ruff>=0.8",
+  "tomli>=2; python_version < '3.11'",
+]
+
+[project.scripts]
+nestra = "nestra.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/mckova/NESTRA"
+Repository = "https://github.com/mckova/NESTRA"
+Issues = "https://github.com/mckova/NESTRA/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+nestra = ["models/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --basetemp=.pytest-tmp"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"benchmarks/**/*.py" = ["E402"]
+"scripts/*.py" = ["E402"]

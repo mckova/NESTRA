@@ -1,0 +1,19 @@
+services:
+  nestra:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      NESTRA_API_TOKEN: ${NESTRA_API_TOKEN:?Set NESTRA_API_TOKEN}
+      NESTRA_STORE_DIR: /data
+    volumes:
+      - nestra-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  nestra-data:

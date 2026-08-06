@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "kind": "nestra-micro-safety-logistic",
+  "status": "experimental",
+  "featureSchemaVersion": 1,
+  "featureNames": [
+    "question_length",
+    "query_term_count",
+    "reasoning_cues",
+    "binary_question",
+    "retrieval_intent",
+    "safe_query_coverage",
+    "safe_intent_coverage",
+    "structural_chain",
+    "evidence_tokens",
+    "atom_count",
+    "document_count",
+    "bridge_count",
+    "expanded_query_coverage",
+    "expanded_intent_coverage",
+    "maximum_sensitivity"
+  ],
+  "trainedAt": "2026-08-06T00:00:00Z",
+  "normalization": {
+    "means": [
+      0.649123,
+      0.533333,
+      0.055556,
+      0.166667,
+      0.0,
+      0.547531,
+      0.393169,
+      1.0,
+      0.282778,
+      0.333333,
+      0.333333,
+      0.25,
+      0.547531,
+      0.393169,
+      0.0
+    ],
+    "standardDeviations": [
+      0.04857,
+      0.160631,
+      0.103935,
+      0.372678,
+      1.0,
+      0.231853,
+      0.263471,
+      1.0,
+      0.021893,
+      1.0,
+      1.0,
+      1.0,
+      0.231853,
+      0.263471,
+      1.0
+    ]
+  },
+  "coefficients": [
+    -0.936854,
+    -0.405468,
+    -0.539355,
+    -0.491174,
+    0.0,
+    -0.101385,
+    1.031724,
+    0.0,
+    -0.584645,
+    0.0,
+    0.0,
+    0.0,
+    -0.101385,
+    1.031724,
+    0.0
+  ],
+  "intercept": -0.744374,
+  "thresholds": {
+    "fullProbabilityMaximum": 0.975348,
+    "microProbabilityMinimum": 1.000001,
+    "microEnabled": false,
+    "minimumMicroPrecision": 0.9,
+    "minimumFullPrecision": 0.8,
+    "minimumMicroSelections": 3,
+    "minimumFullSelections": 3
+  },
+  "training": {
+    "examples": 18,
+    "positives": 6,
+    "negatives": 12,
+    "epochs": 1200,
+    "learningRate": 0.08,
+    "l2": 0.02,
+    "metrics": {
+      "classifierAccuracy": 0.944444,
+      "brierScore": 0.081241,
+      "logLoss": 0.284532,
+      "microPrecision": 0.0,
+      "microRecall": 0.0,
+      "unsafeMicroRate": 0.0,
+      "fullUnsafePrecision": 0.666667,
+      "fullUnsafeRecall": 1.0,
+      "fullOverRoutingRate": 1.0,
+      "policyDecisionAccuracy": 0.666667,
+      "policyDecisionCoverage": 1.0,
+      "routeRates": {
+        "micro": 0.0,
+        "meso": 0.0,
+        "full": 1.0
+      }
+    }
+  },
+  "validation": {
+    "examples": 6,
+    "positives": 1,
+    "negatives": 5,
+    "metrics": {
+      "classifierAccuracy": 0.5,
+      "brierScore": 0.381077,
+      "logLoss": 1.219049,
+      "microPrecision": 0.0,
+      "microRecall": 0.0,
+      "unsafeMicroRate": 0.0,
+      "fullUnsafePrecision": 0.8,
+      "fullUnsafeRecall": 0.8,
+      "fullOverRoutingRate": 1.0,
+      "policyDecisionAccuracy": 0.8,
+      "policyDecisionCoverage": 0.833333,
+      "routeRates": {
+        "micro": 0.0,
+        "meso": 0.166667,
+        "full": 0.833333
+      }
+    }
+  },
+  "provenance": {
+    "trainingArtifacts": [
+      "benchmarks/nestra-oracle/results/migration-source/micro-dev-v3.json",
+      "benchmarks/nestra-oracle/results/migration-source/micro-100-validation-12-seed-1618033.json"
+    ],
+    "validationArtifact": "benchmarks/nestra-oracle/results/migration-source/micro-final-holdout-seed-314159.json",
+    "label": "Micro accuracy lock accepted and, when raw Micro quality is available, token F1 is within 0.05 of Adaptive Full",
+    "containsRawText": false,
+    "implementation": "python"
+  },
+  "modelId": "router-5cde0ce5edce5665"
+}

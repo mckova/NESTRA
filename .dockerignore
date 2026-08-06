@@ -1,0 +1,17 @@
+.git
+.github
+.nestra
+.pytest-tmp
+.venv
+__pycache__
+.coverage
+htmlcov
+build
+dist
+*.egg-info
+benchmarks
+tests
+*.log
+*.whl
+*.tar.gz
+.env*

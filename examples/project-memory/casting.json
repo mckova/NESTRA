@@ -1,0 +1,27 @@
+{
+  "projectId": "casting-demo",
+  "question": "What is Sissy Spacek's middle name?",
+  "documents": [
+    {
+      "title": "Bobbi Bacha",
+      "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.",
+      "trust": "trusted",
+      "sourceQuality": 1,
+      "sourceUri": "demo://bobbi-bacha"
+    },
+    {
+      "title": "Sissy Spacek",
+      "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.",
+      "trust": "trusted",
+      "sourceQuality": 1,
+      "sourceUri": "demo://sissy-spacek"
+    },
+    {
+      "title": "Garden",
+      "text": "A garden may contain trees and flowers.",
+      "trust": "trusted",
+      "sourceQuality": 1,
+      "sourceUri": "demo://noise"
+    }
+  ]
+}

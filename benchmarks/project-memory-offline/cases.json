@@ -1,0 +1,75 @@
+[
+  {
+    "id": "trusted-bridge",
+    "question": "What is Sissy Spacek's middle name?",
+    "expectedRoute": "micro",
+    "gate": { "maxEvidenceTokens": 80 },
+    "documents": [
+      { "title": "Bobbi Bacha", "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.", "trust": "trusted" },
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "trusted" }
+    ]
+  },
+  {
+    "id": "missing-second-fact",
+    "question": "What is Sissy Spacek's middle name?",
+    "expectedRoute": "fallback",
+    "expectedReasons": ["insufficient_facts", "missing_second_document"],
+    "documents": [
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "trusted" }
+    ]
+  },
+  {
+    "id": "untrusted-evidence",
+    "question": "What is Sissy Spacek's middle name?",
+    "expectedRoute": "blocked",
+    "expectedReasons": ["untrusted_evidence"],
+    "recall": { "trustedOnly": false },
+    "documents": [
+      { "title": "Bobbi Bacha", "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.", "trust": "untrusted" },
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "untrusted" }
+    ]
+  },
+  {
+    "id": "sensitive-evidence",
+    "question": "What is Sissy Spacek's middle name?",
+    "expectedRoute": "blocked",
+    "expectedReasons": ["sensitive_evidence"],
+    "recall": { "maxSensitivity": 1 },
+    "gate": { "maxSensitivity": 0.5, "maxEvidenceTokens": 80 },
+    "documents": [
+      { "title": "Bobbi Bacha", "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.", "trust": "trusted", "sensitivity": 0.9 },
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "trusted", "sensitivity": 0.9 }
+    ]
+  },
+  {
+    "id": "no-bridge",
+    "question": "Which city connects Ada Lovelace and coral reefs?",
+    "expectedRoute": "fallback",
+    "expectedReasons": ["no_structural_chain"],
+    "documents": [
+      { "title": "Ada Lovelace", "text": "Ada Lovelace wrote notes about the Analytical Engine.", "trust": "trusted" },
+      { "title": "Coral reef", "text": "Coral reefs support diverse marine ecosystems.", "trust": "trusted" }
+    ]
+  },
+  {
+    "id": "oversized-evidence",
+    "question": "What is Sissy Spacek's middle name?",
+    "expectedRoute": "fallback",
+    "expectedReasons": ["evidence_exceeds_micro_budget"],
+    "gate": { "maxEvidenceTokens": 10 },
+    "documents": [
+      { "title": "Bobbi Bacha", "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.", "trust": "trusted" },
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "trusted" }
+    ]
+  },
+  {
+    "id": "hebrew-bridge",
+    "question": "באיזו מדינה כיהן דוד בן גוריון כראש ממשלה?",
+    "expectedRoute": "micro",
+    "gate": { "minimumIntentCoverage": 0.1, "maxEvidenceTokens": 80 },
+    "documents": [
+      { "title": "דוד בן גוריון", "text": "דוד בן גוריון כיהן כראש הממשלה הראשון של ישראל.", "trust": "trusted" },
+      { "title": "ישראל", "text": "ישראל היא מדינה במזרח התיכון ודוד בן גוריון היה מראשי הנהגתה.", "trust": "trusted" }
+    ]
+  }
+]

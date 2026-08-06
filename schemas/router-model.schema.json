@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nestra.dev/schemas/router-model.schema.json",
+  "title": "NESTRA learned-router artifact",
+  "type": "object",
+  "required": [
+    "schemaVersion", "kind", "status", "featureSchemaVersion", "featureNames",
+    "trainedAt", "normalization", "coefficients", "intercept", "thresholds",
+    "training", "validation", "provenance", "modelId"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "nestra-micro-safety-logistic" },
+    "status": { "enum": ["experimental", "candidate", "production"] },
+    "featureSchemaVersion": { "const": 1 },
+    "featureNames": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "items": { "type": "string" }
+    },
+    "trainedAt": { "type": "string", "format": "date-time" },
+    "normalization": {
+      "type": "object",
+      "required": ["means", "standardDeviations"],
+      "properties": {
+        "means": { "$ref": "#/$defs/vector" },
+        "standardDeviations": { "$ref": "#/$defs/vector" }
+      },
+      "additionalProperties": false
+    },
+    "coefficients": { "$ref": "#/$defs/vector" },
+    "intercept": { "type": "number" },
+    "thresholds": {
+      "type": "object",
+      "required": ["fullProbabilityMaximum", "microProbabilityMinimum", "microEnabled", "minimumMicroPrecision", "minimumFullPrecision", "minimumMicroSelections", "minimumFullSelections"],
+      "properties": {
+        "fullProbabilityMaximum": { "type": "number", "minimum": 0, "maximum": 1 },
+        "microProbabilityMinimum": { "type": "number", "minimum": 0, "maximum": 1.000001 },
+        "microEnabled": { "type": "boolean" },
+        "minimumMicroPrecision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minimumFullPrecision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minimumMicroSelections": { "type": "integer", "minimum": 1 },
+        "minimumFullSelections": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "training": { "$ref": "#/$defs/split" },
+    "validation": { "$ref": "#/$defs/split" },
+    "provenance": { "type": "object" },
+    "modelId": { "type": "string", "pattern": "^router-[a-f0-9]{16}$" }
+  },
+  "$defs": {
+    "vector": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "items": { "type": "number" }
+    },
+    "split": {
+      "type": "object",
+      "required": ["examples", "positives", "negatives", "metrics"],
+      "properties": {
+        "examples": { "type": "integer", "minimum": 1 },
+        "positives": { "type": "integer", "minimum": 0 },
+        "negatives": { "type": "integer", "minimum": 0 },
+        "metrics": { "type": "object" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

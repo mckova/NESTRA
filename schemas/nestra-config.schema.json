@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nestra.dev/schemas/nestra-config.schema.json",
+  "title": "NESTRA configuration",
+  "type": "object",
+  "properties": {
+    "security": { "type": "object" },
+    "routing": { "type": "object" },
+    "tiers": {
+      "type": "object",
+      "required": ["micro", "meso", "full"],
+      "properties": {
+        "micro": { "$ref": "#/$defs/tier" },
+        "meso": { "$ref": "#/$defs/tier" },
+        "full": { "$ref": "#/$defs/tier" }
+      }
+    },
+    "runtime": { "type": "object" }
+  },
+  "$defs": {
+    "tier": {
+      "type": "object",
+      "required": ["model", "reasoningEffort", "maxOutputTokens"],
+      "properties": {
+        "model": { "type": "string" },
+        "reasoningEffort": { "enum": ["none", "low", "medium", "high", "xhigh", "max"] },
+        "maxOutputTokens": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

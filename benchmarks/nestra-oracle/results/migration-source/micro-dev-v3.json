@@ -1,0 +1,711 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T17:49:43.903Z",
+  "oracle": {
+    "question": "Does Agent Hive improve answer quality enough to justify its latency and token cost?",
+    "dataset": "hotpotqa/hotpot_qa",
+    "config": "distractor",
+    "split": "validation",
+    "examples": 6,
+    "seed": 7419,
+    "excludedIds": [],
+    "includedIds": [
+      "5a8c7595554299585d9e36b6",
+      "5a85fb085542994775f606de",
+      "5a8f4c8d554299458435d5a3",
+      "5ab51dae5542991779162d82",
+      "5ae2070a5542994d89d5b313",
+      "5ae4a3265542995ad6573de5"
+    ],
+    "enabledMethods": [
+      "accuracyLockedMicroHive"
+    ],
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "none",
+    "outputTokenBudgetPerSystem": 416,
+    "rag": "local BM25 top-3 + one gpt-5.6-sol call",
+    "hive": "scout -> forager -> builder -> guard; every cell uses gpt-5.6-sol",
+    "adaptiveMemoryHive": "scoped evidence memory + goal controller + hooks + early stop + at most one guard repair; every model call uses gpt-5.6-sol",
+    "accuracyLockedMicroHive": "token-budgeted atomic evidence + one compact gpt-5.6-sol call + deterministic accuracy lock + one full-context fallback when the lock fails",
+    "loss": "taskLoss = 1 - HotpotQA token F1; exactLoss = 1 - exact match"
+  },
+  "methods": {
+    "accuracyLockedMicroHive": {
+      "examples": 6,
+      "calls": 10,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.7777777777777777,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.22222222222222224,
+      "averageEndToEndLatencyMs": 3631.8851,
+      "p50EndToEndLatencyMs": 4200.7857,
+      "usage": {
+        "inputTokens": 5918,
+        "outputTokens": 103,
+        "reasoningTokens": 0,
+        "totalTokens": 6021
+      },
+      "averageTokensPerExample": 1003.5
+    }
+  },
+  "examples": [
+    {
+      "id": "5a8f4c8d554299458435d5a3",
+      "type": "bridge",
+      "level": "hard",
+      "question": "Scott Parkin has been a vocal critic of Exxonmobil and another corporation that has operations in how many countries ?",
+      "expected": "more than 70 countries",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "more than 70 countries",
+          "endToEndLatencyMs": 4273.1354,
+          "usage": {
+            "inputTokens": 1285,
+            "outputTokens": 19,
+            "reasoningTokens": 0,
+            "totalTokens": 1304,
+            "modelLatencyMs": 4266.0214
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "More than 70 countries.",
+              "latencyMs": 1589.8808999999997,
+              "usage": {
+                "input_tokens": 79,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 89
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "more than 70 countries",
+              "latencyMs": 2676.1404999999995,
+              "usage": {
+                "input_tokens": 1206,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1203,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1215
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 89,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 90,
+            "localCompilationLatencyMs": 6.135200000000054,
+            "localLexicalTokensScanned": 825,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Scott Parkin",
+                "text": "…of Iraq, and of corporations such as Exxonmobil and Halliburton.",
+                "estimatedTokens": 17,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Halliburton",
+                "text": "…service companies, it has operations in more than 70 countries.",
+                "estimatedTokens": 16,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.2727272727272727,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "low_query_coverage"
+              ],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8f4c8d554299458435d5a3",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a85fb085542994775f606de",
+      "type": "bridge",
+      "level": "hard",
+      "question": "What is the name of the executive producer of the film that has a score composed by Jerry Goldsmith?",
+      "expected": "Ronald Shusett",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "Shusett",
+          "endToEndLatencyMs": 2879.9147999999996,
+          "usage": {
+            "inputTokens": 75,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 82,
+            "modelLatencyMs": 2827.2227999999996
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Shusett",
+              "latencyMs": 2827.2227999999996,
+              "usage": {
+                "input_tokens": 75,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 82
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 82,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 81,
+            "localCompilationLatencyMs": 46.80919999999969,
+            "localLexicalTokensScanned": 954,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Alien (soundtrack)",
+                "text": "…iconic, avant-garde score to the film \"Alien\" was composed by Jerry Goldsmith…",
+                "estimatedTokens": 20,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Alien (film)",
+                "text": "Shusett was executive producer.",
+                "estimatedTokens": 8,
+                "truncated": false
+              }
+            ],
+            "queryCoverage": 0.875,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": true,
+              "reasons": [],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": false
+          },
+          "monitoring": {
+            "traceId": "micro:5a85fb085542994775f606de",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.6666666666666666,
+            "exactLoss": 1,
+            "taskLoss": 0.33333333333333337
+          }
+        }
+      }
+    },
+    {
+      "id": "5a8c7595554299585d9e36b6",
+      "type": "bridge",
+      "level": "hard",
+      "question": "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+      "expected": "Chief of Protocol",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "United States ambassador to Ghana",
+          "endToEndLatencyMs": 4718.0916,
+          "usage": {
+            "inputTokens": 1507,
+            "outputTokens": 18,
+            "reasoningTokens": 0,
+            "totalTokens": 1525,
+            "modelLatencyMs": 4703.315799999999
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "United States Ambassador to Ghana",
+              "latencyMs": 2517.6213,
+              "usage": {
+                "input_tokens": 85,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 94
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "United States ambassador to Ghana",
+              "latencyMs": 2185.6944999999996,
+              "usage": {
+                "input_tokens": 1422,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1419,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1431
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 94,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 86,
+            "localCompilationLatencyMs": 14.46559999999954,
+            "localLexicalTokensScanned": 865,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Kiss and Tell (1945 film)",
+                "text": "…a 1945 American comedy film starring then 17-year-old Shirley Temple as Corliss…",
+                "estimatedTokens": 21,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "A Kiss for Corliss",
+                "text": "It is a sequel to the 1945 film \"Kiss and Tell\".",
+                "estimatedTokens": 12,
+                "truncated": false
+              }
+            ],
+            "queryCoverage": 0.4,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "low_query_coverage",
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8c7595554299585d9e36b6",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0,
+            "exactLoss": 1,
+            "taskLoss": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "5ae2070a5542994d89d5b313",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Which performance act has a higher instrument to person ratio, Badly Drawn Boy or Wolf Alice? ",
+      "expected": "Badly Drawn Boy",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "Badly Drawn Boy",
+          "endToEndLatencyMs": 4200.7857,
+          "usage": {
+            "inputTokens": 1290,
+            "outputTokens": 18,
+            "reasoningTokens": 0,
+            "totalTokens": 1308,
+            "modelLatencyMs": 4164.017599999999
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Badly Drawn Boy",
+              "latencyMs": 1741.6206000000002,
+              "usage": {
+                "input_tokens": 89,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 98
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Badly Drawn Boy",
+              "latencyMs": 2422.396999999999,
+              "usage": {
+                "input_tokens": 1201,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1198,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1210
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 98,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 93,
+            "localCompilationLatencyMs": 11.742500000000291,
+            "localLexicalTokensScanned": 726,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Badly Drawn Boy",
+                "text": "Damon Michael Gough (born 2 October 1969, in Dunstable, Bedfordshire), known by…",
+                "estimatedTokens": 20,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Wolf Alice",
+                "text": "…four-piece alternative rock band from North London, formed initially as a two-person…",
+                "estimatedTokens": 22,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.09090909090909091,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "low_query_coverage",
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5ae2070a5542994d89d5b313",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5ab51dae5542991779162d82",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Are both Elko Regional Airport and Gerald R. Ford International Airport located in Michigan?",
+      "expected": "no",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "no",
+          "endToEndLatencyMs": 4404.881300000001,
+          "usage": {
+            "inputTokens": 1663,
+            "outputTokens": 29,
+            "reasoningTokens": 0,
+            "totalTokens": 1692,
+            "modelLatencyMs": 4338.064000000002
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "No. Gerald R. Ford International Airport is in Michigan; El",
+              "latencyMs": 2786.4359000000004,
+              "usage": {
+                "input_tokens": 90,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 16,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 106
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "No, only Gerald R. Ford is.",
+              "latencyMs": 1551.6281000000017,
+              "usage": {
+                "input_tokens": 1573,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1570,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 13,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1586
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 106,
+            "compactCallMetTarget": false,
+            "estimatedCompactCallTokens": 94,
+            "localCompilationLatencyMs": 66.03429999999935,
+            "localLexicalTokensScanned": 986,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Gerald R. Ford International Airport",
+                "text": "…commercial airport in Cascade Township approximately 13 mi southeast of Grand Rapids, Michigan.",
+                "estimatedTokens": 24,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Elko Regional Airport",
+                "text": "Elko Regional Airport (IATA: EKO, ICAO: KEKO, FAA LID: EKO) , formerly Elko…",
+                "estimatedTokens": 19,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.5,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "binary_evidence_incomplete"
+              ],
+              "grounded": false,
+              "binary": true
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5ab51dae5542991779162d82",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5ae4a3265542995ad6573de5",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Hayden is a singer-songwriter from Canada, but where does Buck-Tick hail from?",
+      "expected": "Fujioka, Gunma",
+      "executionOrder": [
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "Fujioka, Gunma",
+          "endToEndLatencyMs": 1314.5018000000018,
+          "usage": {
+            "inputTokens": 98,
+            "outputTokens": 12,
+            "reasoningTokens": 0,
+            "totalTokens": 110,
+            "modelLatencyMs": 1310.6075999999994
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Fujioka, Gunma, Japan",
+              "latencyMs": 1310.6075999999994,
+              "usage": {
+                "input_tokens": 98,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 12,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 110
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 110,
+            "compactCallMetTarget": false,
+            "estimatedCompactCallTokens": 93,
+            "localCompilationLatencyMs": 3.5160999999970954,
+            "localLexicalTokensScanned": 786,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Buck-Tick",
+                "text": "Buck-Tick (stylized as BUCK-TICK) is a Japanese rock band, formed in Fujioka, Gunma in…",
+                "estimatedTokens": 22,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Hayden (musician)",
+                "text": "…Hayden Desser (born February 12, 1971) who records as Hayden, is a Canadian singer-songwriter…",
+                "estimatedTokens": 24,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.7142857142857143,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": true,
+              "reasons": [],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": false
+          },
+          "monitoring": {
+            "traceId": "micro:5ae4a3265542995ad6573de5",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    }
+  ]
+}

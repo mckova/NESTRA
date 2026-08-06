@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-06T12:57:05.425598Z",
+  "purpose": "Deterministic routing and safety evaluation only; this does not measure model answer accuracy.",
+  "implementation": "python",
+  "cases": 7,
+  "passed": 7,
+  "providerTokens": 0,
+  "rows": [
+    {
+      "id": "trusted-bridge",
+      "expectedRoute": "micro",
+      "actualRoute": "micro",
+      "passed": true,
+      "expectedReasons": [],
+      "actualReasons": [],
+      "missingReasons": [],
+      "ingestionLatencyMs": 2.2770999930799007,
+      "recallLatencyMs": 1.4849998988211155,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 2,
+        "lexicalTokensScanned": 19
+      }
+    },
+    {
+      "id": "missing-second-fact",
+      "expectedRoute": "fallback",
+      "actualRoute": "fallback",
+      "passed": true,
+      "expectedReasons": [
+        "insufficient_facts",
+        "missing_second_document"
+      ],
+      "actualReasons": [
+        "insufficient_facts",
+        "missing_second_document",
+        "no_structural_chain"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.5171999800950289,
+      "recallLatencyMs": 0.26439991779625416,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 1,
+        "facts": 1,
+        "entities": 2,
+        "relations": 1,
+        "lexicalTokensScanned": 11
+      }
+    },
+    {
+      "id": "untrusted-evidence",
+      "expectedRoute": "blocked",
+      "actualRoute": "blocked",
+      "passed": true,
+      "expectedReasons": [
+        "untrusted_evidence"
+      ],
+      "actualReasons": [
+        "untrusted_evidence"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 1.029800157994032,
+      "recallLatencyMs": 0.6167998071759939,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 2,
+        "lexicalTokensScanned": 19
+      }
+    },
+    {
+      "id": "sensitive-evidence",
+      "expectedRoute": "blocked",
+      "actualRoute": "blocked",
+      "passed": true,
+      "expectedReasons": [
+        "sensitive_evidence"
+      ],
+      "actualReasons": [
+        "sensitive_evidence"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.9212000295519829,
+      "recallLatencyMs": 0.4485000390559435,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 2,
+        "lexicalTokensScanned": 19
+      }
+    },
+    {
+      "id": "no-bridge",
+      "expectedRoute": "fallback",
+      "actualRoute": "fallback",
+      "passed": true,
+      "expectedReasons": [
+        "no_structural_chain"
+      ],
+      "actualReasons": [
+        "no_structural_chain"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.8167000487446785,
+      "recallLatencyMs": 0.42559998109936714,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 1,
+        "lexicalTokensScanned": 14
+      }
+    },
+    {
+      "id": "oversized-evidence",
+      "expectedRoute": "fallback",
+      "actualRoute": "fallback",
+      "passed": true,
+      "expectedReasons": [
+        "evidence_exceeds_micro_budget"
+      ],
+      "actualReasons": [
+        "evidence_exceeds_micro_budget"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.8127999026328325,
+      "recallLatencyMs": 0.49640005454421043,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 2,
+        "lexicalTokensScanned": 19
+      }
+    },
+    {
+      "id": "hebrew-bridge",
+      "expectedRoute": "micro",
+      "actualRoute": "micro",
+      "passed": true,
+      "expectedReasons": [],
+      "actualReasons": [],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.9127999655902386,
+      "recallLatencyMs": 0.49629993736743927,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 2,
+        "relations": 2,
+        "lexicalTokensScanned": 20
+      }
+    }
+  ]
+}

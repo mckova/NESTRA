@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m ruff format --check src tests benchmarks scripts examples
+      - run: python -m ruff check src tests benchmarks scripts examples
+      - run: python -m pytest
+      - if: matrix.python == '3.13'
+        run: python -m pytest --cov=nestra --cov-branch --cov-report=term-missing --cov-fail-under=80
+      - run: python scripts/validate_release.py
+      - if: matrix.python == '3.13'
+        run: |
+          python scripts/train_router.py
+          python benchmarks/router_ml/run.py
+          python benchmarks/project_memory_offline/run.py
+          git diff --exit-code -- models/router/micro-safety-demo.json src/nestra/models/micro-safety-demo.json benchmarks/router-ml/results
+      - if: matrix.python == '3.13'
+        run: python -m build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: nestra:test

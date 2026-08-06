@@ -1,0 +1,3368 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T17:52:26.209Z",
+  "oracle": {
+    "question": "Does Agent Hive improve answer quality enough to justify its latency and token cost?",
+    "dataset": "hotpotqa/hotpot_qa",
+    "config": "distractor",
+    "split": "validation",
+    "examples": 6,
+    "seed": 20260805,
+    "excludedIds": [
+      "5a8c7595554299585d9e36b6",
+      "5a85fb085542994775f606de",
+      "5a8f4c8d554299458435d5a3",
+      "5ab51dae5542991779162d82",
+      "5ae2070a5542994d89d5b313",
+      "5ae4a3265542995ad6573de5",
+      "5ae5aba0554299546bf82f17",
+      "5a85ea095542994775f606a8",
+      "5ae0d4c9554299603e418468",
+      "5ab56e32554299637185c594",
+      "5a7cc50e554299452d57ba3e",
+      "5a8979f4554299669944a52e",
+      "5ae32e125542991a06ce9946",
+      "5ab96ab755429970cfb8eacd",
+      "5adbf0a255429947ff17385a",
+      "5a8133725542995ce29dcbdb",
+      "5a8e068b5542995085b37384"
+    ],
+    "includedIds": [],
+    "enabledMethods": [
+      "directGpt56",
+      "ragGpt56",
+      "agentHive",
+      "adaptiveMemoryHive",
+      "accuracyLockedMicroHive"
+    ],
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "none",
+    "outputTokenBudgetPerSystem": 416,
+    "rag": "local BM25 top-3 + one gpt-5.6-sol call",
+    "hive": "scout -> forager -> builder -> guard; every cell uses gpt-5.6-sol",
+    "adaptiveMemoryHive": "scoped evidence memory + goal controller + hooks + early stop + at most one guard repair; every model call uses gpt-5.6-sol",
+    "accuracyLockedMicroHive": "token-budgeted atomic evidence + one compact gpt-5.6-sol call + deterministic accuracy lock + one full-context fallback when the lock fails",
+    "loss": "taskLoss = 1 - HotpotQA token F1; exactLoss = 1 - exact match"
+  },
+  "methods": {
+    "directGpt56": {
+      "examples": 6,
+      "calls": 6,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.7777777777777777,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.22222222222222224,
+      "averageEndToEndLatencyMs": 2868.209849999998,
+      "p50EndToEndLatencyMs": 1676.6843,
+      "usage": {
+        "inputTokens": 381,
+        "outputTokens": 43,
+        "reasoningTokens": 0,
+        "totalTokens": 424
+      },
+      "averageTokensPerExample": 70.66666666666667
+    },
+    "ragGpt56": {
+      "examples": 6,
+      "calls": 6,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.8095238095238096,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.19047619047619047,
+      "averageEndToEndLatencyMs": 2462.9417666666695,
+      "p50EndToEndLatencyMs": 2306.717800000013,
+      "usage": {
+        "inputTokens": 2436,
+        "outputTokens": 44,
+        "reasoningTokens": 0,
+        "totalTokens": 2480
+      },
+      "averageTokensPerExample": 413.3333333333333
+    },
+    "agentHive": {
+      "examples": 6,
+      "calls": 24,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.8761904761904762,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.12380952380952381,
+      "averageEndToEndLatencyMs": 10018.709949999999,
+      "p50EndToEndLatencyMs": 9470.790099999998,
+      "usage": {
+        "inputTokens": 16230,
+        "outputTokens": 609,
+        "reasoningTokens": 0,
+        "totalTokens": 16839
+      },
+      "averageTokensPerExample": 2806.5
+    },
+    "adaptiveMemoryHive": {
+      "examples": 6,
+      "calls": 10,
+      "exactMatch": 0.8333333333333334,
+      "tokenF1": 0.9761904761904763,
+      "exactLoss": 0.16666666666666666,
+      "taskLoss": 0.02380952380952382,
+      "averageEndToEndLatencyMs": 4617.955616666665,
+      "p50EndToEndLatencyMs": 3624.474900000001,
+      "usage": {
+        "inputTokens": 8405,
+        "outputTokens": 221,
+        "reasoningTokens": 0,
+        "totalTokens": 8626
+      },
+      "averageTokensPerExample": 1437.6666666666667
+    },
+    "accuracyLockedMicroHive": {
+      "examples": 6,
+      "calls": 12,
+      "exactMatch": 0.8333333333333334,
+      "tokenF1": 0.9761904761904763,
+      "exactLoss": 0.16666666666666666,
+      "taskLoss": 0.02380952380952382,
+      "averageEndToEndLatencyMs": 5828.672849999999,
+      "p50EndToEndLatencyMs": 3581.317599999995,
+      "usage": {
+        "inputTokens": 8983,
+        "outputTokens": 95,
+        "reasoningTokens": 0,
+        "totalTokens": 9078
+      },
+      "averageTokensPerExample": 1513
+    }
+  },
+  "examples": [
+    {
+      "id": "5a8a3e745542996c9b8d5e70",
+      "type": "bridge",
+      "level": "hard",
+      "question": "What is the name for the adventure in \"Tunnels and Trolls\", a game designed by Ken St. Andre?",
+      "expected": "Arena of Khazan",
+      "executionOrder": [
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "directGpt56": {
+          "answer": "Buffalo Castle",
+          "endToEndLatencyMs": 1676.6843,
+          "usage": {
+            "inputTokens": 69,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 76,
+            "modelLatencyMs": 1676.4846
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Buffalo Castle",
+              "latencyMs": 1676.4846,
+              "usage": {
+                "input_tokens": 69,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 76
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0,
+            "exactLoss": 1,
+            "taskLoss": 1
+          }
+        },
+        "ragGpt56": {
+          "answer": "Arena of Khazan",
+          "endToEndLatencyMs": 2737.0733999999998,
+          "usage": {
+            "inputTokens": 412,
+            "outputTokens": 8,
+            "reasoningTokens": 0,
+            "totalTokens": 420,
+            "modelLatencyMs": 2735.6906
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Arena of Khazan",
+              "latencyMs": 2735.6906,
+              "usage": {
+                "input_tokens": 412,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 420
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 1.2962999999999738,
+            "selectedTitles": [
+              "Tunnels &amp; Trolls",
+              "Mercenaries, Spies and Private Eyes",
+              "Arena of Khazan"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "Arena of Khazan",
+          "endToEndLatencyMs": 6365.171399999999,
+          "usage": {
+            "inputTokens": 2651,
+            "outputTokens": 80,
+            "reasoningTokens": 0,
+            "totalTokens": 2731,
+            "modelLatencyMs": 6300.638699999999
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: [\"Tunnels & Trolls\", \"Ken St. Andre\"]\nevidence: [\"Tunnels & Trolls identifies Ken St. Andre as the game's designer.\", \"The same document should supply the specific term used for an adventure.\"]",
+              "latencyMs": 2161.1225999999997,
+              "usage": {
+                "input_tokens": 375,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 431
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "Arena of Khazan",
+              "latencyMs": 1508.6412,
+              "usage": {
+                "input_tokens": 1630,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1627,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1638
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Arena of Khazan",
+              "latencyMs": 1191.9425999999985,
+              "usage": {
+                "input_tokens": 318,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 326
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Arena of Khazan",
+              "latencyMs": 1438.9323000000004,
+              "usage": {
+                "input_tokens": 328,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 336
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: [\"Tunnels & Trolls\", \"Ken St. Andre\"]\nevidence: [\"Tunnels & Trolls identifies Ken St. Andre as the game's designer.\", \"The same document should supply the specific term used for an adventure.\"]",
+            "forage": "Arena of Khazan",
+            "build": "Arena of Khazan",
+            "verify": "Arena of Khazan"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "Arena of Khazan",
+          "endToEndLatencyMs": 3892.1018000000004,
+          "usage": {
+            "inputTokens": 450,
+            "outputTokens": 34,
+            "reasoningTokens": 0,
+            "totalTokens": 484,
+            "modelLatencyMs": 3696.569299999999
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Arena of Khazan\",\"confidence\":0.99,\"sources\":[\"Tunnels &amp; Trolls\",\"Arena of Khazan\"]}",
+              "latencyMs": 3696.569299999999,
+              "usage": {
+                "input_tokens": 450,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 34,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 484
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: What is the name for the adventure in \"Tunnels and Trolls\", a game designed by Ken St. Andre?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 450,
+              "outputTokens": 34,
+              "totalTokens": 484,
+              "latencyMs": 3696.569299999999
+            },
+            "states": [
+              {
+                "answer": "Arena of Khazan",
+                "confidence": 0.99,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:52:37.008Z",
+                "data": {
+                  "chars": 93,
+                  "scope": "mission:5a8a3e745542996c9b8d5e70"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:52:37.012Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:52:37.013Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:52:37.031Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:52:40.728Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 450,
+                  "outputTokens": 34,
+                  "totalTokens": 484,
+                  "latencyMs": 3696.569299999999
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T17:52:40.729Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 0.99,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:52:40.730Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a8a3e745542996c9b8d5e70",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "Arena of Khazan",
+            "confidence": 0.99,
+            "sources": [
+              "Tunnels &amp; Trolls",
+              "Arena of Khazan"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Arena of Khazan\",\"confidence\":0.99,\"sources\":[\"Tunnels &amp; Trolls\",\"Arena of Khazan\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "Arena of Khazan",
+          "endToEndLatencyMs": 3151.0126999999993,
+          "usage": {
+            "inputTokens": 1439,
+            "outputTokens": 14,
+            "reasoningTokens": 0,
+            "totalTokens": 1453,
+            "modelLatencyMs": 2989.091999999997
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Tunnels",
+              "latencyMs": 1560.7511999999988,
+              "usage": {
+                "input_tokens": 78,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 84
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Arena of Khazan",
+              "latencyMs": 1428.3407999999981,
+              "usage": {
+                "input_tokens": 1361,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1358,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1369
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 84,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 77,
+            "localCompilationLatencyMs": 155.77400000000125,
+            "localLexicalTokensScanned": 846,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Ken St. Andre",
+                "text": "…game designer, best known for his work with \"Tunnels…",
+                "estimatedTokens": 14,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "St. Andre (Goa Assembly constituency)",
+                "text": "St. Andre is also one of the 20 constituencies…",
+                "estimatedTokens": 12,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.4444444444444444,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "possibly_incomplete_name"
+              ],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8a3e745542996c9b8d5e70",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5ab6d09255429954757d337d",
+      "type": "bridge",
+      "level": "hard",
+      "question": "The football manager who recruited David Beckham managed Manchester United during what timeframe?",
+      "expected": "from 1986 to 2013",
+      "executionOrder": [
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56"
+      ],
+      "systems": {
+        "ragGpt56": {
+          "answer": "1986 to 2013",
+          "endToEndLatencyMs": 2478.9941,
+          "usage": {
+            "inputTokens": 267,
+            "outputTokens": 10,
+            "reasoningTokens": 0,
+            "totalTokens": 277,
+            "modelLatencyMs": 2467.6669
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "1986 to 2013",
+              "latencyMs": 2467.6669,
+              "usage": {
+                "input_tokens": 267,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 277
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.8068000000021129,
+            "selectedTitles": [
+              "Joshua Parlby",
+              "Ernest Mangnall",
+              "Alex Ferguson"
+            ]
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8571428571428571,
+            "exactLoss": 1,
+            "taskLoss": 0.1428571428571429
+          }
+        },
+        "agentHive": {
+          "answer": "1986 to 2013",
+          "endToEndLatencyMs": 6931.013800000001,
+          "usage": {
+            "inputTokens": 2318,
+            "outputTokens": 87,
+            "reasoningTokens": 0,
+            "totalTokens": 2405,
+            "modelLatencyMs": 6914.619599999998
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: sufficient\nartifacts: Alex Ferguson\nevidence: David Beckham was recruited by Alex Ferguson; Ferguson managed Manchester United from November 1986 to May 2013.\nblockers: none\nspent: 2 hops\nreusable_context: Use “",
+              "latencyMs": 3174.0357000000004,
+              "usage": {
+                "input_tokens": 341,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 397
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "1986 to 2013.",
+              "latencyMs": 1474.2153999999973,
+              "usage": {
+                "input_tokens": 1364,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1361,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 11,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1375
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "1986 to 2013",
+              "latencyMs": 1134.2121999999981,
+              "usage": {
+                "input_tokens": 301,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 311
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "1986 to 2013",
+              "latencyMs": 1132.1563000000024,
+              "usage": {
+                "input_tokens": 312,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 322
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: sufficient\nartifacts: Alex Ferguson\nevidence: David Beckham was recruited by Alex Ferguson; Ferguson managed Manchester United from November 1986 to May 2013.\nblockers: none\nspent: 2 hops\nreusable_context: Use “",
+            "forage": "1986 to 2013.",
+            "build": "1986 to 2013",
+            "verify": "1986 to 2013"
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8571428571428571,
+            "exactLoss": 1,
+            "taskLoss": 0.1428571428571429
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "1986 to 2013",
+          "endToEndLatencyMs": 3459.6571000000004,
+          "usage": {
+            "inputTokens": 1423,
+            "outputTokens": 36,
+            "reasoningTokens": 0,
+            "totalTokens": 1459,
+            "modelLatencyMs": 3241.3025000000052
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"1986 to 2013\",\"confidence\":0.79,\"sources\":[\"Alex Ferguson\"]}",
+              "latencyMs": 2024.517200000002,
+              "usage": {
+                "input_tokens": 305,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 26,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 331
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            },
+            {
+              "name": "adaptive-guard",
+              "text": "1986 to 2013",
+              "latencyMs": 1216.7853000000032,
+              "usage": {
+                "input_tokens": 1118,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1115,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1128
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: The football manager who recruited David Beckham managed Manchester United during what timeframe?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 2,
+              "iterations": 2,
+              "inputTokens": 1423,
+              "outputTokens": 36,
+              "totalTokens": 1459,
+              "latencyMs": 3241.3025000000052
+            },
+            "states": [
+              {
+                "answer": "1986 to 2013",
+                "confidence": 0.79,
+                "evidenceCount": 1,
+                "conflict": false
+              },
+              {
+                "answer": "1986 to 2013",
+                "confidence": 0.9,
+                "evidenceCount": 10,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:52:53.489Z",
+                "data": {
+                  "chars": 97,
+                  "scope": "mission:5ab6d09255429954757d337d"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:52:53.490Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:52:53.495Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:52:53.503Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:52:55.528Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 305,
+                  "outputTokens": 26,
+                  "totalTokens": 331,
+                  "latencyMs": 2024.517200000002
+                }
+              },
+              {
+                "name": "on_low_confidence",
+                "at": "2026-08-05T17:52:55.529Z",
+                "data": {
+                  "confidence": 0.79,
+                  "evidenceCount": 1
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:52:55.731Z",
+                "data": {
+                  "cell": "guard",
+                  "evidenceCount": 10
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:52:56.948Z",
+                "data": {
+                  "calls": 2,
+                  "iterations": 2,
+                  "inputTokens": 1423,
+                  "outputTokens": 36,
+                  "totalTokens": 1459,
+                  "latencyMs": 3241.3025000000052
+                }
+              },
+              {
+                "name": "on_loop_stopped",
+                "at": "2026-08-05T17:52:56.948Z",
+                "data": {
+                  "reason": "goal_reached"
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:52:56.949Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 10,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5ab6d09255429954757d337d",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": true,
+            "earlyStopped": false,
+            "hookEvents": 10,
+            "memoryEvents": 38,
+            "memoryRecordsBeforeCleanup": 12,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 12
+          },
+          "draft": {
+            "answer": "1986 to 2013",
+            "confidence": 0.79,
+            "sources": [
+              "Alex Ferguson"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"1986 to 2013\",\"confidence\":0.79,\"sources\":[\"Alex Ferguson\"]}"
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8571428571428571,
+            "exactLoss": 1,
+            "taskLoss": 0.1428571428571429
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "1986 to 2013",
+          "endToEndLatencyMs": 6816.039900000003,
+          "usage": {
+            "inputTokens": 1173,
+            "outputTokens": 20,
+            "reasoningTokens": 0,
+            "totalTokens": 1193,
+            "modelLatencyMs": 6551.922600000002
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "1986 to 2013",
+              "latencyMs": 2963.2043999999987,
+              "usage": {
+                "input_tokens": 62,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 72
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "1986 to 2013",
+              "latencyMs": 3588.718200000003,
+              "usage": {
+                "input_tokens": 1111,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1108,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1121
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 72,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 82,
+            "localCompilationLatencyMs": 263.5568999999996,
+            "localLexicalTokensScanned": 707,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "1995–96 Manchester United F.C. season",
+                "text": "…the more remarkable by the fact that Alex Ferguson…",
+                "estimatedTokens": 13,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Alex Ferguson",
+                "text": "…former football manager and player who managed Manchester United…",
+                "estimatedTokens": 17,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.5,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5ab6d09255429954757d337d",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8571428571428571,
+            "exactLoss": 1,
+            "taskLoss": 0.1428571428571429
+          }
+        },
+        "directGpt56": {
+          "answer": "1986–2013",
+          "endToEndLatencyMs": 5930.925499999998,
+          "usage": {
+            "inputTokens": 59,
+            "outputTokens": 9,
+            "reasoningTokens": 0,
+            "totalTokens": 68,
+            "modelLatencyMs": 5930.903400000003
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "1986–2013",
+              "latencyMs": 5930.903400000003,
+              "usage": {
+                "input_tokens": 59,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 68
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.6666666666666666,
+            "exactLoss": 1,
+            "taskLoss": 0.33333333333333337
+          }
+        }
+      }
+    },
+    {
+      "id": "5ab3e45655429976abd1bcd4",
+      "type": "bridge",
+      "level": "hard",
+      "question": "The Vermont Catamounts men's soccer team currently competes in a conference that was formerly known as what from 1988 to 1996?",
+      "expected": "the North Atlantic Conference",
+      "executionOrder": [
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56"
+      ],
+      "systems": {
+        "agentHive": {
+          "answer": "North Atlantic Conference",
+          "endToEndLatencyMs": 12691.485399999998,
+          "usage": {
+            "inputTokens": 2830,
+            "outputTokens": 77,
+            "reasoningTokens": 0,
+            "totalTokens": 2907,
+            "modelLatencyMs": 12690.202700000002
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: Vermont Catamounts men's soccer; America East Conference\nevidence: Soccer article identifies its current conference; conference article gives the 1988–1996 former name.\nblockers: corpus text not supplied\nspent: 2",
+              "latencyMs": 4419.102700000003,
+              "usage": {
+                "input_tokens": 417,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 473
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "North Atlantic Conference",
+              "latencyMs": 2138.6176999999952,
+              "usage": {
+                "input_tokens": 1750,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1747,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1757
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "North Atlantic Conference",
+              "latencyMs": 2358.127100000005,
+              "usage": {
+                "input_tokens": 327,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 334
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "North Atlantic Conference",
+              "latencyMs": 3774.355199999998,
+              "usage": {
+                "input_tokens": 336,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 343
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: Vermont Catamounts men's soccer; America East Conference\nevidence: Soccer article identifies its current conference; conference article gives the 1988–1996 former name.\nblockers: corpus text not supplied\nspent: 2",
+            "forage": "North Atlantic Conference",
+            "build": "North Atlantic Conference",
+            "verify": "North Atlantic Conference"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "North Atlantic Conference",
+          "endToEndLatencyMs": 2863.4613000000027,
+          "usage": {
+            "inputTokens": 388,
+            "outputTokens": 32,
+            "reasoningTokens": 0,
+            "totalTokens": 420,
+            "modelLatencyMs": 2861.1388000000006
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"North Atlantic Conference\",\"confidence\":1.0,\"sources\":[\"Vermont Catamounts men's soccer\",\"America East Conference\"]}",
+              "latencyMs": 2861.1388000000006,
+              "usage": {
+                "input_tokens": 388,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 32,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 420
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: The Vermont Catamounts men's soccer team currently competes in a conference that was formerly known as what from 1988 to 1996?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 388,
+              "outputTokens": 32,
+              "totalTokens": 420,
+              "latencyMs": 2861.1388000000006
+            },
+            "states": [
+              {
+                "answer": "North Atlantic Conference",
+                "confidence": 1,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:53:22.392Z",
+                "data": {
+                  "chars": 126,
+                  "scope": "mission:5ab3e45655429976abd1bcd4"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:53:22.392Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:53:22.393Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:53:22.393Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:53:25.255Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 388,
+                  "outputTokens": 32,
+                  "totalTokens": 420,
+                  "latencyMs": 2861.1388000000006
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T17:53:25.255Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 1,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:53:25.255Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5ab3e45655429976abd1bcd4",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "North Atlantic Conference",
+            "confidence": 1,
+            "sources": [
+              "Vermont Catamounts men's soccer",
+              "America East Conference"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"North Atlantic Conference\",\"confidence\":1.0,\"sources\":[\"Vermont Catamounts men's soccer\",\"America East Conference\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "North Atlantic Conference",
+          "endToEndLatencyMs": 3581.317599999995,
+          "usage": {
+            "inputTokens": 1558,
+            "outputTokens": 14,
+            "reasoningTokens": 0,
+            "totalTokens": 1572,
+            "modelLatencyMs": 3247.083899999998
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "North Atlantic Conference",
+              "latencyMs": 1889.699099999998,
+              "usage": {
+                "input_tokens": 76,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 83
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "North Atlantic Conference",
+              "latencyMs": 1357.3847999999998,
+              "usage": {
+                "input_tokens": 1482,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1479,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1489
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 83,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 80,
+            "localCompilationLatencyMs": 333.7639999999956,
+            "localLexicalTokensScanned": 973,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Vermont Catamounts men's soccer",
+                "text": "…competes in the America East Conference.",
+                "estimatedTokens": 11,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "America East Conference",
+                "text": "…Atlantic Conference from 1988 to 1996.",
+                "estimatedTokens": 10,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.3333333333333333,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "low_query_coverage",
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5ab3e45655429976abd1bcd4",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "North Atlantic Conference",
+          "endToEndLatencyMs": 1197.3978999999963,
+          "usage": {
+            "inputTokens": 74,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 81,
+            "modelLatencyMs": 1197.3438000000024
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "North Atlantic Conference",
+              "latencyMs": 1197.3438000000024,
+              "usage": {
+                "input_tokens": 74,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 81
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "North Atlantic Conference",
+          "endToEndLatencyMs": 4713.138200000001,
+          "usage": {
+            "inputTokens": 350,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 357,
+            "modelLatencyMs": 4694.557000000001
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "North Atlantic Conference",
+              "latencyMs": 4694.557000000001,
+              "usage": {
+                "input_tokens": 350,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 357
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 18.506399999998393,
+            "selectedTitles": [
+              "America East Conference",
+              "Vermont Catamounts men's soccer",
+              "Vermont Catamounts men's ice hockey"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a8b57f25542995d1e6f1371",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Were Scott Derrickson and Ed Wood of the same nationality?",
+      "expected": "yes",
+      "executionOrder": [
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56",
+        "agentHive"
+      ],
+      "systems": {
+        "adaptiveMemoryHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 4098.316299999991,
+          "usage": {
+            "inputTokens": 1829,
+            "outputTokens": 44,
+            "reasoningTokens": 0,
+            "totalTokens": 1873,
+            "modelLatencyMs": 3896.4882999999827
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Cannot be determined\",\"confidence\":0.0,\"sources\":[\"Doctor Strange (2016 film)\",\"Ed Wood (film)\"]}",
+              "latencyMs": 1894.073299999989,
+              "usage": {
+                "input_tokens": 506,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 34,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 540
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            },
+            {
+              "name": "adaptive-guard",
+              "text": "Yes, both were American.",
+              "latencyMs": 2002.4149999999936,
+              "usage": {
+                "input_tokens": 1323,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1320,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1333
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Were Scott Derrickson and Ed Wood of the same nationality?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 2,
+              "iterations": 2,
+              "inputTokens": 1829,
+              "outputTokens": 44,
+              "totalTokens": 1873,
+              "latencyMs": 3896.4882999999827
+            },
+            "states": [
+              {
+                "answer": "Cannot be determined",
+                "confidence": 0,
+                "evidenceCount": 2,
+                "conflict": false
+              },
+              {
+                "answer": "Yes, both were American.",
+                "confidence": 0.9,
+                "evidenceCount": 10,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:53:34.853Z",
+                "data": {
+                  "chars": 58,
+                  "scope": "mission:5a8b57f25542995d1e6f1371"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:53:34.853Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:53:34.856Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:53:34.857Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:53:36.751Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 506,
+                  "outputTokens": 34,
+                  "totalTokens": 540,
+                  "latencyMs": 1894.073299999989
+                }
+              },
+              {
+                "name": "on_low_confidence",
+                "at": "2026-08-05T17:53:36.751Z",
+                "data": {
+                  "confidence": 0,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:53:36.930Z",
+                "data": {
+                  "cell": "guard",
+                  "evidenceCount": 10
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:53:38.933Z",
+                "data": {
+                  "calls": 2,
+                  "iterations": 2,
+                  "inputTokens": 1829,
+                  "outputTokens": 44,
+                  "totalTokens": 1873,
+                  "latencyMs": 3896.4882999999827
+                }
+              },
+              {
+                "name": "on_loop_stopped",
+                "at": "2026-08-05T17:53:38.933Z",
+                "data": {
+                  "reason": "goal_reached"
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:53:38.933Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 10,
+                  "missionDeleted": 1
+                }
+              },
+              {
+                "name": "on_output_sanitized",
+                "at": "2026-08-05T17:53:38.951Z",
+                "data": {
+                  "rule": "binary_answer_span"
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a8b57f25542995d1e6f1371",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": true,
+            "earlyStopped": false,
+            "hookEvents": 11,
+            "memoryEvents": 38,
+            "memoryRecordsBeforeCleanup": 12,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 12
+          },
+          "draft": {
+            "answer": "Cannot be determined",
+            "confidence": 0,
+            "sources": [
+              "Doctor Strange (2016 film)",
+              "Ed Wood (film)"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Cannot be determined\",\"confidence\":0.0,\"sources\":[\"Doctor Strange (2016 film)\",\"Ed Wood (film)\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 4664.713999999993,
+          "usage": {
+            "inputTokens": 1391,
+            "outputTokens": 20,
+            "reasoningTokens": 0,
+            "totalTokens": 1411,
+            "modelLatencyMs": 4661.755000000005
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Yes, both were American.",
+              "latencyMs": 3314.9416999999958,
+              "usage": {
+                "input_tokens": 85,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 95
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Yes, both were American.",
+              "latencyMs": 1346.813300000009,
+              "usage": {
+                "input_tokens": 1306,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1303,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1316
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 95,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 79,
+            "localCompilationLatencyMs": 2.4686000000074273,
+            "localLexicalTokensScanned": 782,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Scott Derrickson",
+                "text": "Scott Derrickson (born July 16, 1966) is an American director, screenwriter and…",
+                "estimatedTokens": 20,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Ed Wood",
+                "text": "Edward Davis Wood Jr. (October 10, 1924 – December 10, 1978) was…",
+                "estimatedTokens": 17,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.5,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "binary_evidence_incomplete"
+              ],
+              "grounded": false,
+              "binary": true
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8b57f25542995d1e6f1371",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "Yes.",
+          "endToEndLatencyMs": 3568.222299999994,
+          "usage": {
+            "inputTokens": 57,
+            "outputTokens": 6,
+            "reasoningTokens": 0,
+            "totalTokens": 63,
+            "modelLatencyMs": 3568.1965000000055
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Yes.",
+              "latencyMs": 3568.1965000000055,
+              "usage": {
+                "input_tokens": 57,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 63
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "unknown",
+          "endToEndLatencyMs": 1139.5666999999958,
+          "usage": {
+            "inputTokens": 468,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 473,
+            "modelLatencyMs": 1138.6468000000023
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "unknown",
+              "latencyMs": 1138.6468000000023,
+              "usage": {
+                "input_tokens": 468,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 473
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.8732000000018161,
+            "selectedTitles": [
+              "Woodson, Arkansas",
+              "Doctor Strange (2016 film)",
+              "Ed Wood (film)"
+            ]
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0,
+            "exactLoss": 1,
+            "taskLoss": 1
+          }
+        },
+        "agentHive": {
+          "answer": "Yes, both were American.",
+          "endToEndLatencyMs": 9470.790099999998,
+          "usage": {
+            "inputTokens": 2529,
+            "outputTokens": 102,
+            "reasoningTokens": 0,
+            "totalTokens": 2631,
+            "modelLatencyMs": 9470.303400000019
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: [Scott Derrickson, Ed Wood]\nevidence: nationality field from each biography; compare values\nblockers: corpus text not supplied\nspent: 2 hops\nreusable_context: Scott Derrickson → nationality; Ed Wood",
+              "latencyMs": 2057.018100000001,
+              "usage": {
+                "input_tokens": 331,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 387
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "Yes. “Scott Derrickson” identifies him as American, and “Ed Wood” identifies Wood as American.",
+              "latencyMs": 4130.967300000004,
+              "usage": {
+                "input_tokens": 1563,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1560,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 26,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1589
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Yes, both were American.",
+              "latencyMs": 1648.5722000000096,
+              "usage": {
+                "input_tokens": 312,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 322
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Yes, both were American.",
+              "latencyMs": 1633.7458000000042,
+              "usage": {
+                "input_tokens": 323,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 10,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 333
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: [Scott Derrickson, Ed Wood]\nevidence: nationality field from each biography; compare values\nblockers: corpus text not supplied\nspent: 2 hops\nreusable_context: Scott Derrickson → nationality; Ed Wood",
+            "forage": "Yes. “Scott Derrickson” identifies him as American, and “Ed Wood” identifies Wood as American.",
+            "build": "Yes, both were American.",
+            "verify": "Yes, both were American."
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.4,
+            "exactLoss": 1,
+            "taskLoss": 0.6
+          }
+        }
+      }
+    },
+    {
+      "id": "5a7a0e1e5542990783324e1a",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Which dog's ancestors include Gordon and Irish Setters: the Manchester Terrier or the Scotch Collie?",
+      "expected": "Scotch Collie",
+      "executionOrder": [
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "Scotch Collie",
+          "endToEndLatencyMs": 3256.435200000007,
+          "usage": {
+            "inputTokens": 1858,
+            "outputTokens": 16,
+            "reasoningTokens": 0,
+            "totalTokens": 1874,
+            "modelLatencyMs": 3246.2690000000002
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Scotch Collie",
+              "latencyMs": 2157.739400000006,
+              "usage": {
+                "input_tokens": 65,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 73
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Scotch Collie",
+              "latencyMs": 1088.5295999999944,
+              "usage": {
+                "input_tokens": 1793,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1790,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1801
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 73,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 78,
+            "localCompilationLatencyMs": 9.889100000000326,
+            "localLexicalTokensScanned": 1271,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Manchester Terrier",
+                "text": "The Manchester Terrier is a breed of dog of…",
+                "estimatedTokens": 11,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Scotch Collie",
+                "text": "Other ancestors include the Gordon and Irish Setters.",
+                "estimatedTokens": 14,
+                "truncated": false
+              }
+            ],
+            "queryCoverage": 0.8,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a7a0e1e5542990783324e1a",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "Scotch Collie",
+          "endToEndLatencyMs": 1484.5188999999955,
+          "usage": {
+            "inputTokens": 64,
+            "outputTokens": 8,
+            "reasoningTokens": 0,
+            "totalTokens": 72,
+            "modelLatencyMs": 1484.5002999999997
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Scotch Collie",
+              "latencyMs": 1484.5002999999997,
+              "usage": {
+                "input_tokens": 64,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 72
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "Scotch Collie",
+          "endToEndLatencyMs": 1402.160400000008,
+          "usage": {
+            "inputTokens": 475,
+            "outputTokens": 8,
+            "reasoningTokens": 0,
+            "totalTokens": 483,
+            "modelLatencyMs": 1401.2657000000036
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Scotch Collie",
+              "latencyMs": 1401.2657000000036,
+              "usage": {
+                "input_tokens": 475,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 483
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.8506999999954132,
+            "selectedTitles": [
+              "Scotch Collie",
+              "English Setter",
+              "Florence Nagle"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "Scotch Collie",
+          "endToEndLatencyMs": 12023.952600000004,
+          "usage": {
+            "inputTokens": 3088,
+            "outputTokens": 118,
+            "reasoningTokens": 0,
+            "totalTokens": 3206,
+            "modelLatencyMs": 12023.161499999987
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: [Scotch Collie]\nevidence: [Scotch Collie document must state its ancestors include Gordon and Irish Setters; Manchester Terrier document serves as the comparison check]\nblockers: [Corpus text not supplied]\nspent:",
+              "latencyMs": 3394.121699999989,
+              "usage": {
+                "input_tokens": 331,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 387
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "status: supported\nartifacts: [Scotch Collie]\nevidence: [\"Scotch Collie\": “Other ancestors include the Gordon and Irish Setters.”]\nblockers: []\nspent: 1",
+              "latencyMs": 4994.7929,
+              "usage": {
+                "input_tokens": 2055,
+                "input_tokens_details": {
+                  "cache_write_tokens": 2052,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 46,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 2101
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Scotch Collie",
+              "latencyMs": 2190.063599999994,
+              "usage": {
+                "input_tokens": 346,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 354
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Scotch Collie",
+              "latencyMs": 1444.1833000000042,
+              "usage": {
+                "input_tokens": 356,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 364
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: [Scotch Collie]\nevidence: [Scotch Collie document must state its ancestors include Gordon and Irish Setters; Manchester Terrier document serves as the comparison check]\nblockers: [Corpus text not supplied]\nspent:",
+            "forage": "status: supported\nartifacts: [Scotch Collie]\nevidence: [\"Scotch Collie\": “Other ancestors include the Gordon and Irish Setters.”]\nblockers: []\nspent: 1",
+            "build": "Scotch Collie",
+            "verify": "Scotch Collie"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "Scotch Collie",
+          "endToEndLatencyMs": 9769.722299999994,
+          "usage": {
+            "inputTokens": 2312,
+            "outputTokens": 34,
+            "reasoningTokens": 0,
+            "totalTokens": 2346,
+            "modelLatencyMs": 9755.986799999999
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Scotch Collie\",\"confidence\":1.0,\"sources\":[\"Scotch Collie\"]}",
+              "latencyMs": 7883.914900000003,
+              "usage": {
+                "input_tokens": 513,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 26,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 539
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            },
+            {
+              "name": "adaptive-guard",
+              "text": "Scotch Collie",
+              "latencyMs": 1872.0718999999954,
+              "usage": {
+                "input_tokens": 1799,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1796,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 8,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1807
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Which dog's ancestors include Gordon and Irish Setters: the Manchester Terrier or the Scotch Collie?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 2,
+              "iterations": 2,
+              "inputTokens": 2312,
+              "outputTokens": 34,
+              "totalTokens": 2346,
+              "latencyMs": 9755.986799999999
+            },
+            "states": [
+              {
+                "answer": "Scotch Collie",
+                "confidence": 1,
+                "evidenceCount": 1,
+                "conflict": false
+              },
+              {
+                "answer": "Scotch Collie",
+                "confidence": 0.9,
+                "evidenceCount": 10,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:54:15.970Z",
+                "data": {
+                  "chars": 100,
+                  "scope": "mission:5a7a0e1e5542990783324e1a"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:54:15.970Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:54:15.980Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:54:15.982Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:54:23.866Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 513,
+                  "outputTokens": 26,
+                  "totalTokens": 539,
+                  "latencyMs": 7883.914900000003
+                }
+              },
+              {
+                "name": "on_low_confidence",
+                "at": "2026-08-05T17:54:23.866Z",
+                "data": {
+                  "confidence": 1,
+                  "evidenceCount": 1
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:54:23.867Z",
+                "data": {
+                  "cell": "guard",
+                  "evidenceCount": 10
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:54:25.739Z",
+                "data": {
+                  "calls": 2,
+                  "iterations": 2,
+                  "inputTokens": 2312,
+                  "outputTokens": 34,
+                  "totalTokens": 2346,
+                  "latencyMs": 9755.986799999999
+                }
+              },
+              {
+                "name": "on_loop_stopped",
+                "at": "2026-08-05T17:54:25.739Z",
+                "data": {
+                  "reason": "goal_reached"
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:54:25.739Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 10,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a7a0e1e5542990783324e1a",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": true,
+            "earlyStopped": false,
+            "hookEvents": 10,
+            "memoryEvents": 38,
+            "memoryRecordsBeforeCleanup": 12,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 12
+          },
+          "draft": {
+            "answer": "Scotch Collie",
+            "confidence": 1,
+            "sources": [
+              "Scotch Collie"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Scotch Collie\",\"confidence\":1.0,\"sources\":[\"Scotch Collie\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5ab29c24554299449642c932",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+      "expected": "yes",
+      "executionOrder": [
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "directGpt56": {
+          "answer": "Yes.",
+          "endToEndLatencyMs": 3351.5102000000043,
+          "usage": {
+            "inputTokens": 58,
+            "outputTokens": 6,
+            "reasoningTokens": 0,
+            "totalTokens": 64,
+            "modelLatencyMs": 3351.4820000000036
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Yes.",
+              "latencyMs": 3351.4820000000036,
+              "usage": {
+                "input_tokens": 58,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 64
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "Yes.",
+          "endToEndLatencyMs": 2306.717800000013,
+          "usage": {
+            "inputTokens": 464,
+            "outputTokens": 6,
+            "reasoningTokens": 0,
+            "totalTokens": 470,
+            "modelLatencyMs": 2305.979299999992
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Yes.",
+              "latencyMs": 2305.979299999992,
+              "usage": {
+                "input_tokens": 464,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 470
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.6823999999905936,
+            "selectedTitles": [
+              "Ambroise Thomas",
+              "Armand Castelmary",
+              "List of major opera composers"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "Yes.",
+          "endToEndLatencyMs": 12629.846399999995,
+          "usage": {
+            "inputTokens": 2814,
+            "outputTokens": 145,
+            "reasoningTokens": 0,
+            "totalTokens": 2959,
+            "modelLatencyMs": 12629.2929
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: Giuseppe Verdi; Ambroise Thomas\nevidence: Each article must identify its subject as an opera composer.\nblockers: Corpus text not supplied.\nspent: 22 words\nreusable_context: Verify both classifications, then",
+              "latencyMs": 2197.788400000005,
+              "usage": {
+                "input_tokens": 338,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 394
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "status: yes\nartifacts: Giuseppe Verdi; Ambroise Thomas\nevidence: “Giuseppe Verdi” identifies Verdi as an Italian opera composer; “Ambroise Thomas” identifies Thomas as a French composer best known for his operas.\nblockers: none\nspent: 31 words\nreusable_context: Both were opera composers.",
+              "latencyMs": 2108.765400000004,
+              "usage": {
+                "input_tokens": 1739,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1736,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 77,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1816
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Yes.",
+              "latencyMs": 1726.5832000000082,
+              "usage": {
+                "input_tokens": 365,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 371
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Yes.",
+              "latencyMs": 6596.155899999983,
+              "usage": {
+                "input_tokens": 372,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 378
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: Giuseppe Verdi; Ambroise Thomas\nevidence: Each article must identify its subject as an opera composer.\nblockers: Corpus text not supplied.\nspent: 22 words\nreusable_context: Verify both classifications, then",
+            "forage": "status: yes\nartifacts: Giuseppe Verdi; Ambroise Thomas\nevidence: “Giuseppe Verdi” identifies Verdi as an Italian opera composer; “Ambroise Thomas” identifies Thomas as a French composer best known for his operas.\nblockers: none\nspent: 31 words\nreusable_context: Both were opera composers.",
+            "build": "Yes.",
+            "verify": "Yes."
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 3624.474900000001,
+          "usage": {
+            "inputTokens": 2003,
+            "outputTokens": 41,
+            "reasoningTokens": 0,
+            "totalTokens": 2044,
+            "modelLatencyMs": 3518.7611000000034
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Yes\",\"confidence\":0.86,\"sources\":[\"Ambroise Thomas\",\"Armand Castelmary\",\"List of major opera composers\"]}",
+              "latencyMs": 2115.4151999999885,
+              "usage": {
+                "input_tokens": 502,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 35,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 537
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            },
+            {
+              "name": "adaptive-guard",
+              "text": "Yes.",
+              "latencyMs": 1403.3459000000148,
+              "usage": {
+                "input_tokens": 1501,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1498,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1507
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 2,
+              "iterations": 2,
+              "inputTokens": 2003,
+              "outputTokens": 41,
+              "totalTokens": 2044,
+              "latencyMs": 3518.7611000000034
+            },
+            "states": [
+              {
+                "answer": "Yes",
+                "confidence": 0.86,
+                "evidenceCount": 3,
+                "conflict": false
+              },
+              {
+                "answer": "Yes.",
+                "confidence": 0.9,
+                "evidenceCount": 10,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:54:44.033Z",
+                "data": {
+                  "chars": 61,
+                  "scope": "mission:5ab29c24554299449642c932"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:54:44.093Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:54:44.093Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:54:44.094Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:54:46.209Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 502,
+                  "outputTokens": 35,
+                  "totalTokens": 537,
+                  "latencyMs": 2115.4151999999885
+                }
+              },
+              {
+                "name": "on_low_confidence",
+                "at": "2026-08-05T17:54:46.210Z",
+                "data": {
+                  "confidence": 0.86,
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:54:46.253Z",
+                "data": {
+                  "cell": "guard",
+                  "evidenceCount": 10
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:54:47.656Z",
+                "data": {
+                  "calls": 2,
+                  "iterations": 2,
+                  "inputTokens": 2003,
+                  "outputTokens": 41,
+                  "totalTokens": 2044,
+                  "latencyMs": 3518.7611000000034
+                }
+              },
+              {
+                "name": "on_loop_stopped",
+                "at": "2026-08-05T17:54:47.656Z",
+                "data": {
+                  "reason": "goal_reached"
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:54:47.657Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 10,
+                  "missionDeleted": 1
+                }
+              },
+              {
+                "name": "on_output_sanitized",
+                "at": "2026-08-05T17:54:47.657Z",
+                "data": {
+                  "rule": "binary_answer_span"
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5ab29c24554299449642c932",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": true,
+            "earlyStopped": false,
+            "hookEvents": 11,
+            "memoryEvents": 38,
+            "memoryRecordsBeforeCleanup": 12,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 12
+          },
+          "draft": {
+            "answer": "Yes",
+            "confidence": 0.86,
+            "sources": [
+              "Ambroise Thomas",
+              "Armand Castelmary",
+              "List of major opera composers"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Yes\",\"confidence\":0.86,\"sources\":[\"Ambroise Thomas\",\"Armand Castelmary\",\"List of major opera composers\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 13502.517699999997,
+          "usage": {
+            "inputTokens": 1564,
+            "outputTokens": 11,
+            "reasoningTokens": 0,
+            "totalTokens": 1575,
+            "modelLatencyMs": 13478.753600000025
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Yes.",
+              "latencyMs": 10851.907200000016,
+              "usage": {
+                "input_tokens": 83,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 89
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Yes",
+              "latencyMs": 2626.8464000000095,
+              "usage": {
+                "input_tokens": 1481,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1478,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1486
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 89,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 76,
+            "localCompilationLatencyMs": 23.473300000012387,
+            "localLexicalTokensScanned": 863,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Ambroise Thomas",
+                "text": "Charles Louis Ambroise Thomas (5 August 1811 – 12 February 1896) was…",
+                "estimatedTokens": 18,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Giuseppe Verdi",
+                "text": "…or 10 October 1813 – 27 January 1901) was an Italian opera…",
+                "estimatedTokens": 15,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.5,
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "binary_evidence_incomplete"
+              ],
+              "grounded": false,
+              "binary": true
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5ab29c24554299449642c932",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    }
+  ]
+}

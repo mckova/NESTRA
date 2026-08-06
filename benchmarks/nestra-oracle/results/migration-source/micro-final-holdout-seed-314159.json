@@ -1,0 +1,3237 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T17:59:11.312Z",
+  "oracle": {
+    "question": "Does Agent Hive improve answer quality enough to justify its latency and token cost?",
+    "dataset": "hotpotqa/hotpot_qa",
+    "config": "distractor",
+    "split": "validation",
+    "examples": 6,
+    "seed": 314159,
+    "excludedIds": [
+      "5a8c7595554299585d9e36b6",
+      "5a85fb085542994775f606de",
+      "5a8f4c8d554299458435d5a3",
+      "5ab51dae5542991779162d82",
+      "5ae2070a5542994d89d5b313",
+      "5ae4a3265542995ad6573de5",
+      "5ae5aba0554299546bf82f17",
+      "5a85ea095542994775f606a8",
+      "5ae0d4c9554299603e418468",
+      "5ab56e32554299637185c594",
+      "5a7cc50e554299452d57ba3e",
+      "5a8979f4554299669944a52e",
+      "5ae32e125542991a06ce9946",
+      "5ab96ab755429970cfb8eacd",
+      "5adbf0a255429947ff17385a",
+      "5a8133725542995ce29dcbdb",
+      "5a8e068b5542995085b37384",
+      "5a8a3e745542996c9b8d5e70",
+      "5ab6d09255429954757d337d",
+      "5ab3e45655429976abd1bcd4",
+      "5a8b57f25542995d1e6f1371",
+      "5a7a0e1e5542990783324e1a",
+      "5ab29c24554299449642c932"
+    ],
+    "includedIds": [],
+    "enabledMethods": [
+      "directGpt56",
+      "ragGpt56",
+      "agentHive",
+      "adaptiveMemoryHive",
+      "accuracyLockedMicroHive"
+    ],
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "none",
+    "outputTokenBudgetPerSystem": 416,
+    "rag": "local BM25 top-3 + one gpt-5.6-sol call",
+    "hive": "scout -> forager -> builder -> guard; every cell uses gpt-5.6-sol",
+    "adaptiveMemoryHive": "scoped evidence memory + goal controller + hooks + early stop + at most one guard repair; every model call uses gpt-5.6-sol",
+    "accuracyLockedMicroHive": "token-budgeted atomic evidence + one compact gpt-5.6-sol call + deterministic accuracy lock + one full-context fallback when the lock fails",
+    "loss": "taskLoss = 1 - HotpotQA token F1; exactLoss = 1 - exact match"
+  },
+  "methods": {
+    "directGpt56": {
+      "examples": 6,
+      "calls": 6,
+      "exactMatch": 0.8333333333333334,
+      "tokenF1": 0.9666666666666667,
+      "exactLoss": 0.16666666666666666,
+      "taskLoss": 0.033333333333333326,
+      "averageEndToEndLatencyMs": 3503.9846833333327,
+      "p50EndToEndLatencyMs": 1936.9691999999923,
+      "usage": {
+        "inputTokens": 380,
+        "outputTokens": 38,
+        "reasoningTokens": 0,
+        "totalTokens": 418
+      },
+      "averageTokensPerExample": 69.66666666666667
+    },
+    "ragGpt56": {
+      "examples": 6,
+      "calls": 6,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.7999999999999999,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.19999999999999998,
+      "averageEndToEndLatencyMs": 3172.0606666666695,
+      "p50EndToEndLatencyMs": 2406.000800000009,
+      "usage": {
+        "inputTokens": 2625,
+        "outputTokens": 39,
+        "reasoningTokens": 0,
+        "totalTokens": 2664
+      },
+      "averageTokensPerExample": 444
+    },
+    "agentHive": {
+      "examples": 6,
+      "calls": 24,
+      "exactMatch": 0.6666666666666666,
+      "tokenF1": 0.8555555555555555,
+      "exactLoss": 0.3333333333333333,
+      "taskLoss": 0.14444444444444443,
+      "averageEndToEndLatencyMs": 13267.669166666672,
+      "p50EndToEndLatencyMs": 12923.971100000002,
+      "usage": {
+        "inputTokens": 16937,
+        "outputTokens": 599,
+        "reasoningTokens": 0,
+        "totalTokens": 17536
+      },
+      "averageTokensPerExample": 2922.6666666666665
+    },
+    "adaptiveMemoryHive": {
+      "examples": 6,
+      "calls": 7,
+      "exactMatch": 0.8333333333333334,
+      "tokenF1": 0.9666666666666667,
+      "exactLoss": 0.16666666666666666,
+      "taskLoss": 0.033333333333333326,
+      "averageEndToEndLatencyMs": 2516.1492000000003,
+      "p50EndToEndLatencyMs": 2038.8025000000052,
+      "usage": {
+        "inputTokens": 4364,
+        "outputTokens": 197,
+        "reasoningTokens": 0,
+        "totalTokens": 4561
+      },
+      "averageTokensPerExample": 760.1666666666666
+    },
+    "accuracyLockedMicroHive": {
+      "examples": 6,
+      "calls": 11,
+      "exactMatch": 0.8333333333333334,
+      "tokenF1": 0.9666666666666667,
+      "exactLoss": 0.16666666666666666,
+      "taskLoss": 0.033333333333333326,
+      "averageEndToEndLatencyMs": 3502.1299500000027,
+      "p50EndToEndLatencyMs": 3237.6642999999967,
+      "usage": {
+        "inputTokens": 8545,
+        "outputTokens": 79,
+        "reasoningTokens": 0,
+        "totalTokens": 8624
+      },
+      "averageTokensPerExample": 1437.3333333333333
+    }
+  },
+  "examples": [
+    {
+      "id": "5a8361b65542992ef85e22a0",
+      "type": "bridge",
+      "level": "hard",
+      "question": "Vince Phillips held a junior welterweight title by an organization recognized by what larger Hall of Fame?",
+      "expected": "International Boxing Hall of Fame",
+      "executionOrder": [
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "directGpt56": {
+          "answer": "International Boxing Hall of Fame",
+          "endToEndLatencyMs": 2835.1369999999997,
+          "usage": {
+            "inputTokens": 66,
+            "outputTokens": 9,
+            "reasoningTokens": 0,
+            "totalTokens": 75,
+            "modelLatencyMs": 2834.9636
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 2834.9636,
+              "usage": {
+                "input_tokens": 66,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 75
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "International Boxing Hall of Fame",
+          "endToEndLatencyMs": 3210.9395,
+          "usage": {
+            "inputTokens": 339,
+            "outputTokens": 9,
+            "reasoningTokens": 0,
+            "totalTokens": 348,
+            "modelLatencyMs": 3207.1249999999995
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 3207.1249999999995,
+              "usage": {
+                "input_tokens": 339,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 348
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 3.2029999999999745,
+            "selectedTitles": [
+              "Vince Phillips",
+              "International Boxing Federation",
+              "Zab Judah"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "International Boxing Hall of Fame",
+          "endToEndLatencyMs": 12943.431400000001,
+          "usage": {
+            "inputTokens": 3314,
+            "outputTokens": 83,
+            "reasoningTokens": 0,
+            "totalTokens": 3397,
+            "modelLatencyMs": 12819.315900000003
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: Vince Phillips → International Boxing Federation (IBF) junior welterweight title → IBF recognized by International Boxing Hall of Fame\nevidence: \"Vince Phillips\"; \"International Boxing Federation\"\nblockers: corpus text not supplied",
+              "latencyMs": 6980.1314999999995,
+              "usage": {
+                "input_tokens": 339,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 395
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 1597.831400000001,
+              "usage": {
+                "input_tokens": 2342,
+                "input_tokens_details": {
+                  "cache_write_tokens": 2339,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 2351
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 2885.0650000000023,
+              "usage": {
+                "input_tokens": 311,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 320
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 1356.2880000000005,
+              "usage": {
+                "input_tokens": 322,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 331
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: Vince Phillips → International Boxing Federation (IBF) junior welterweight title → IBF recognized by International Boxing Hall of Fame\nevidence: \"Vince Phillips\"; \"International Boxing Federation\"\nblockers: corpus text not supplied",
+            "forage": "International Boxing Hall of Fame",
+            "build": "International Boxing Hall of Fame",
+            "verify": "International Boxing Hall of Fame"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "International Boxing Hall of Fame",
+          "endToEndLatencyMs": 4395.227600000002,
+          "usage": {
+            "inputTokens": 376,
+            "outputTokens": 30,
+            "reasoningTokens": 0,
+            "totalTokens": 406,
+            "modelLatencyMs": 3784.4969999999994
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"International Boxing Hall of Fame\",\"confidence\":1.0,\"sources\":[\"Vince Phillips\",\"International Boxing Federation\"]}",
+              "latencyMs": 3784.4969999999994,
+              "usage": {
+                "input_tokens": 376,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 30,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 406
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Vince Phillips held a junior welterweight title by an organization recognized by what larger Hall of Fame?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 376,
+              "outputTokens": 30,
+              "totalTokens": 406,
+              "latencyMs": 3784.4969999999994
+            },
+            "states": [
+              {
+                "answer": "International Boxing Hall of Fame",
+                "confidence": 1,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:59:30.471Z",
+                "data": {
+                  "chars": 106,
+                  "scope": "mission:5a8361b65542992ef85e22a0"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:59:30.473Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:59:30.474Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:59:30.509Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:59:34.294Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 376,
+                  "outputTokens": 30,
+                  "totalTokens": 406,
+                  "latencyMs": 3784.4969999999994
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T17:59:34.591Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 1,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:59:34.700Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a8361b65542992ef85e22a0",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "International Boxing Hall of Fame",
+            "confidence": 1,
+            "sources": [
+              "Vince Phillips",
+              "International Boxing Federation"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"International Boxing Hall of Fame\",\"confidence\":1.0,\"sources\":[\"Vince Phillips\",\"International Boxing Federation\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "International Boxing Hall of Fame",
+          "endToEndLatencyMs": 4185.297699999999,
+          "usage": {
+            "inputTokens": 2162,
+            "outputTokens": 18,
+            "reasoningTokens": 0,
+            "totalTokens": 2180,
+            "modelLatencyMs": 3364.278699999999
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 1779.6801999999989,
+              "usage": {
+                "input_tokens": 77,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 86
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "International Boxing Hall of Fame",
+              "latencyMs": 1584.5985,
+              "usage": {
+                "input_tokens": 2085,
+                "input_tokens_details": {
+                  "cache_write_tokens": 2082,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 9,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 2094
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 86,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 82,
+            "localCompilationLatencyMs": 810.0626000000011,
+            "localLexicalTokensScanned": 1173,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Vince Phillips",
+                "text": "…held the IBF junior welterweight…",
+                "promptText": "Vince Phillips:…held the IBF junior welterweight…",
+                "estimatedTokens": 13,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Jeff Malcolm",
+                "text": "…World Boxing Organization (WBO) welterweight…",
+                "promptText": "Jeff Malcolm:…World Boxing Organization (WBO) welterweight…",
+                "estimatedTokens": 15,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.5454545454545454,
+            "intentCoverage": 0.4444444444444444,
+            "atomIntentCoverage": [
+              0.3333333333333333,
+              0.2222222222222222
+            ],
+            "structuralChain": false,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "no_structural_chain",
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8361b65542992ef85e22a0",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a87c13f5542996e4f30890c",
+      "type": "bridge",
+      "level": "hard",
+      "question": "In what city did the \"Prince of tenors\" star in a film based on an opera by Giacomo Puccini?",
+      "expected": "Rome",
+      "executionOrder": [
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56"
+      ],
+      "systems": {
+        "ragGpt56": {
+          "answer": "Rome",
+          "endToEndLatencyMs": 3618.369899999998,
+          "usage": {
+            "inputTokens": 400,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 405,
+            "modelLatencyMs": 3615.5351999999984
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Rome",
+              "latencyMs": 3615.5351999999984,
+              "usage": {
+                "input_tokens": 400,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 405
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 2.753999999997177,
+            "selectedTitles": [
+              "Tosca (1956 film)",
+              "La Bohème (1988 film)",
+              "Franco Corelli"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "Rome",
+          "endToEndLatencyMs": 9784.4463,
+          "usage": {
+            "inputTokens": 2819,
+            "outputTokens": 71,
+            "reasoningTokens": 0,
+            "totalTokens": 2890,
+            "modelLatencyMs": 9779.798799999997
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: insufficient_corpus\nartifacts: Franco Corelli; Tosca (1956 film)\nevidence: Need evidence identifying the “Prince of tenors” as Franco Corelli, then the filming/star location stated in Tosca (1956 film).\nblock",
+              "latencyMs": 2486.5576,
+              "usage": {
+                "input_tokens": 370,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 426
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "Rome",
+              "latencyMs": 1372.1633000000002,
+              "usage": {
+                "input_tokens": 1800,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1797,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1805
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Rome",
+              "latencyMs": 1388.2434999999969,
+              "usage": {
+                "input_tokens": 321,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 326
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Rome",
+              "latencyMs": 4532.8344,
+              "usage": {
+                "input_tokens": 328,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 333
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: insufficient_corpus\nartifacts: Franco Corelli; Tosca (1956 film)\nevidence: Need evidence identifying the “Prince of tenors” as Franco Corelli, then the filming/star location stated in Tosca (1956 film).\nblock",
+            "forage": "Rome",
+            "build": "Rome",
+            "verify": "Rome"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "Rome",
+          "endToEndLatencyMs": 2251.3150000000023,
+          "usage": {
+            "inputTokens": 438,
+            "outputTokens": 32,
+            "reasoningTokens": 0,
+            "totalTokens": 470,
+            "modelLatencyMs": 2191.597600000001
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Rome\",\"confidence\":0.98,\"sources\":[\"Franco Corelli\",\"Tosca (1956 film)\"]}",
+              "latencyMs": 2191.597600000001,
+              "usage": {
+                "input_tokens": 438,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 32,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 470
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: In what city did the \"Prince of tenors\" star in a film based on an opera by Giacomo Puccini?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 438,
+              "outputTokens": 32,
+              "totalTokens": 470,
+              "latencyMs": 2191.597600000001
+            },
+            "states": [
+              {
+                "answer": "Rome",
+                "confidence": 0.98,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T17:59:52.365Z",
+                "data": {
+                  "chars": 92,
+                  "scope": "mission:5a87c13f5542996e4f30890c"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T17:59:52.365Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T17:59:52.399Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T17:59:52.423Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T17:59:54.615Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 438,
+                  "outputTokens": 32,
+                  "totalTokens": 470,
+                  "latencyMs": 2191.597600000001
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T17:59:54.616Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 0.98,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T17:59:54.616Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a87c13f5542996e4f30890c",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "Rome",
+            "confidence": 0.98,
+            "sources": [
+              "Franco Corelli",
+              "Tosca (1956 film)"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Rome\",\"confidence\":0.98,\"sources\":[\"Franco Corelli\",\"Tosca (1956 film)\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "Rome",
+          "endToEndLatencyMs": 3237.6642999999967,
+          "usage": {
+            "inputTokens": 1621,
+            "outputTokens": 10,
+            "reasoningTokens": 0,
+            "totalTokens": 1631,
+            "modelLatencyMs": 2519.820200000002
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Rome",
+              "latencyMs": 1446.4652999999962,
+              "usage": {
+                "input_tokens": 94,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 99
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Rome",
+              "latencyMs": 1073.3549000000057,
+              "usage": {
+                "input_tokens": 1527,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1524,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1532
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 99,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 79,
+            "localCompilationLatencyMs": 717.3413999999975,
+            "localLexicalTokensScanned": 909,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Franco Corelli",
+                "text": "Dubbed the \"Prince of tenors\", Corelli…",
+                "promptText": "Franco Corelli:Dubbed the \"Prince of tenors\", Corelli…",
+                "estimatedTokens": 14,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Tosca (1956 film)",
+                "text": "…the opera \"Tosca\" by Giacomo Puccini.",
+                "promptText": "Tosca (1956 film):…the opera \"Tosca\" by Giacomo Puccini.",
+                "estimatedTokens": 14,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.6666666666666666,
+            "intentCoverage": 0.5,
+            "atomIntentCoverage": [
+              0.16666666666666666,
+              0.25
+            ],
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "answer_not_grounded"
+              ],
+              "grounded": false,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a87c13f5542996e4f30890c",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "Rome",
+          "endToEndLatencyMs": 1347.9100000000035,
+          "usage": {
+            "inputTokens": 72,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 77,
+            "modelLatencyMs": 1347.5673000000024
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Rome",
+              "latencyMs": 1347.5673000000024,
+              "usage": {
+                "input_tokens": 72,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 77
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a80721b554299485f5985ef",
+      "type": "bridge",
+      "level": "hard",
+      "question": "The Livesey Hal War Memorial commemorates the fallen of which war, that had over 60 million casualties?",
+      "expected": "World War II",
+      "executionOrder": [
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56"
+      ],
+      "systems": {
+        "agentHive": {
+          "answer": "World War II",
+          "endToEndLatencyMs": 12923.971100000002,
+          "usage": {
+            "inputTokens": 2413,
+            "outputTokens": 77,
+            "reasoningTokens": 0,
+            "totalTokens": 2490,
+            "modelLatencyMs": 12742.819599999995
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: Livesey Hall War Memorial; World War II casualties\nevidence: Need a corpus passage linking the memorial to World War II, plus a passage stating World War II had over 60 million casualties.\nblockers: Supplied titles",
+              "latencyMs": 1946.3410999999978,
+              "usage": {
+                "input_tokens": 351,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 407
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "World War II",
+              "latencyMs": 8445.216100000005,
+              "usage": {
+                "input_tokens": 1427,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1434
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "World War II",
+              "latencyMs": 1163.7437999999966,
+              "usage": {
+                "input_tokens": 313,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 320
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "World War II",
+              "latencyMs": 1187.5185999999958,
+              "usage": {
+                "input_tokens": 322,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 329
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: Livesey Hall War Memorial; World War II casualties\nevidence: Need a corpus passage linking the memorial to World War II, plus a passage stating World War II had over 60 million casualties.\nblockers: Supplied titles",
+            "forage": "World War II",
+            "build": "World War II",
+            "verify": "World War II"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "World War II",
+          "endToEndLatencyMs": 1688.1146000000008,
+          "usage": {
+            "inputTokens": 482,
+            "outputTokens": 31,
+            "reasoningTokens": 0,
+            "totalTokens": 513,
+            "modelLatencyMs": 1640.8574999999983
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"World War II\",\"confidence\":0.99,\"sources\":[\"Livesey Hall War Memorial\",\"World War II casualties\"]}",
+              "latencyMs": 1640.8574999999983,
+              "usage": {
+                "input_tokens": 482,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 31,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 513
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: The Livesey Hal War Memorial commemorates the fallen of which war, that had over 60 million casualties?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 482,
+              "outputTokens": 31,
+              "totalTokens": 513,
+              "latencyMs": 1640.8574999999983
+            },
+            "states": [
+              {
+                "answer": "World War II",
+                "confidence": 0.99,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T18:00:12.297Z",
+                "data": {
+                  "chars": 103,
+                  "scope": "mission:5a80721b554299485f5985ef"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T18:00:12.297Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T18:00:12.298Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T18:00:12.343Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T18:00:13.984Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 482,
+                  "outputTokens": 31,
+                  "totalTokens": 513,
+                  "latencyMs": 1640.8574999999983
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T18:00:13.985Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 0.99,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T18:00:13.985Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a80721b554299485f5985ef",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "World War II",
+            "confidence": 0.99,
+            "sources": [
+              "Livesey Hall War Memorial",
+              "World War II casualties"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"World War II\",\"confidence\":0.99,\"sources\":[\"Livesey Hall War Memorial\",\"World War II casualties\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "World War II",
+          "endToEndLatencyMs": 4088.971599999997,
+          "usage": {
+            "inputTokens": 1232,
+            "outputTokens": 14,
+            "reasoningTokens": 0,
+            "totalTokens": 1246,
+            "modelLatencyMs": 3478.9205999999976
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "World War II",
+              "latencyMs": 1240.6339000000007,
+              "usage": {
+                "input_tokens": 71,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 78
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "World War II",
+              "latencyMs": 2238.286699999997,
+              "usage": {
+                "input_tokens": 1161,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1158,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1168
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 78,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 84,
+            "localCompilationLatencyMs": 609.8084000000017,
+            "localLexicalTokensScanned": 761,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Livesey Hall War Memorial",
+                "text": "The Livesey Hall War Memorial commemorates the fallen…",
+                "promptText": "The Livesey Hall War Memorial commemorates the fallen…",
+                "estimatedTokens": 14,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "World War II casualties",
+                "text": "…million includes deaths from war-related…",
+                "promptText": "World War II casualties:…million includes deaths from war-related…",
+                "estimatedTokens": 17,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.7,
+            "intentCoverage": 0.7,
+            "atomIntentCoverage": [
+              0.5,
+              0.2
+            ],
+            "structuralChain": false,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "no_structural_chain"
+              ],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a80721b554299485f5985ef",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "World War II",
+          "endToEndLatencyMs": 1173.6687999999995,
+          "usage": {
+            "inputTokens": 67,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 74,
+            "modelLatencyMs": 1173.6423000000068
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "World War II",
+              "latencyMs": 1173.6423000000068,
+              "usage": {
+                "input_tokens": 67,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 74
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "World War II",
+          "endToEndLatencyMs": 1424.5773000000045,
+          "usage": {
+            "inputTokens": 444,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 451,
+            "modelLatencyMs": 1423.6601999999984
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "World War II",
+              "latencyMs": 1423.6601999999984,
+              "usage": {
+                "input_tokens": 444,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 451
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.8574999999982538,
+            "selectedTitles": [
+              "World War II casualties",
+              "Livesey Hall War Memorial",
+              "Masnières Newfoundland Memorial"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a7be2595542997c3ec972ac",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Who was born earlier, Emma Bull or Virginia Woolf?",
+      "expected": "Adeline Virginia Woolf",
+      "executionOrder": [
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56",
+        "agentHive"
+      ],
+      "systems": {
+        "adaptiveMemoryHive": {
+          "answer": "Virginia Woolf",
+          "endToEndLatencyMs": 2038.8025000000052,
+          "usage": {
+            "inputTokens": 410,
+            "outputTokens": 27,
+            "reasoningTokens": 0,
+            "totalTokens": 437,
+            "modelLatencyMs": 1935.844100000002
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Virginia Woolf\",\"confidence\":1.0,\"sources\":[\"Emma Bull\",\"Virginia Woolf\"]}",
+              "latencyMs": 1935.844100000002,
+              "usage": {
+                "input_tokens": 410,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 27,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 437
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Who was born earlier, Emma Bull or Virginia Woolf?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 410,
+              "outputTokens": 27,
+              "totalTokens": 437,
+              "latencyMs": 1935.844100000002
+            },
+            "states": [
+              {
+                "answer": "Virginia Woolf",
+                "confidence": 1,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T18:00:20.882Z",
+                "data": {
+                  "chars": 50,
+                  "scope": "mission:5a7be2595542997c3ec972ac"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T18:00:20.882Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T18:00:20.983Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T18:00:20.984Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T18:00:22.920Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 410,
+                  "outputTokens": 27,
+                  "totalTokens": 437,
+                  "latencyMs": 1935.844100000002
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T18:00:22.920Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 1,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T18:00:22.921Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a7be2595542997c3ec972ac",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 7,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "Virginia Woolf",
+            "confidence": 1,
+            "sources": [
+              "Emma Bull",
+              "Virginia Woolf"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Virginia Woolf\",\"confidence\":1.0,\"sources\":[\"Emma Bull\",\"Virginia Woolf\"]}"
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8,
+            "exactLoss": 1,
+            "taskLoss": 0.19999999999999996
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "Virginia Woolf",
+          "endToEndLatencyMs": 2236.8867000000027,
+          "usage": {
+            "inputTokens": 76,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 83,
+            "modelLatencyMs": 1955.520199999999
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Virginia Woolf",
+              "latencyMs": 1955.520199999999,
+              "usage": {
+                "input_tokens": 76,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 83
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 83,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 81,
+            "localCompilationLatencyMs": 280.90750000000116,
+            "localLexicalTokensScanned": 836,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "Virginia Woolf",
+                "text": "Born in an affluent household in Kensington, London, she attended…",
+                "promptText": "Virginia Woolf:Born in an affluent household in Kensington, London, she attended…",
+                "estimatedTokens": 21,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Emma Bull",
+                "text": "Emma Bull (born December 13, 1954) is an American science fiction and fantasy…",
+                "promptText": "Emma Bull (born December 13, 1954) is an American science fiction and fantasy…",
+                "estimatedTokens": 20,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.8333333333333334,
+            "intentCoverage": 0.5,
+            "atomIntentCoverage": [
+              0.5,
+              0.5
+            ],
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": true,
+              "reasons": [],
+              "grounded": true,
+              "binary": false
+            },
+            "escalated": false
+          },
+          "monitoring": {
+            "traceId": "micro:5a7be2595542997c3ec972ac",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8,
+            "exactLoss": 1,
+            "taskLoss": 0.19999999999999996
+          }
+        },
+        "directGpt56": {
+          "answer": "Virginia Woolf",
+          "endToEndLatencyMs": 8431.001499999998,
+          "usage": {
+            "inputTokens": 57,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 64,
+            "modelLatencyMs": 8430.968500000003
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Virginia Woolf",
+              "latencyMs": 8430.968500000003,
+              "usage": {
+                "input_tokens": 57,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 64
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8,
+            "exactLoss": 1,
+            "taskLoss": 0.19999999999999996
+          }
+        },
+        "ragGpt56": {
+          "answer": "Virginia Woolf",
+          "endToEndLatencyMs": 2406.000800000009,
+          "usage": {
+            "inputTokens": 372,
+            "outputTokens": 7,
+            "reasoningTokens": 0,
+            "totalTokens": 379,
+            "modelLatencyMs": 2404.330600000001
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Virginia Woolf",
+              "latencyMs": 2404.330600000001,
+              "usage": {
+                "input_tokens": 372,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 379
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.7788000000000466,
+            "selectedTitles": [
+              "Emma Bull",
+              "The Mark on the Wall",
+              "Virginia Woolf"
+            ]
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8,
+            "exactLoss": 1,
+            "taskLoss": 0.19999999999999996
+          }
+        },
+        "agentHive": {
+          "answer": "Virginia Woolf",
+          "endToEndLatencyMs": 18852.833500000008,
+          "usage": {
+            "inputTokens": 2496,
+            "outputTokens": 107,
+            "reasoningTokens": 0,
+            "totalTokens": 2603,
+            "modelLatencyMs": 18852.3692
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: [Emma Bull, Virginia Woolf]\nevidence: birth dates from both biographies; compare years\nblockers: corpus text not supplied\nspent: 25\nreusable_context: Need cited birth-date lines for each person",
+              "latencyMs": 8276.5968,
+              "usage": {
+                "input_tokens": 331,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 387
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "Virginia Woolf — born 25 January 1882 (“Virginia Woolf”), earlier than Emma Bull, born December 13, 1954 (“Emma Bull”).",
+              "latencyMs": 5472.705499999996,
+              "usage": {
+                "input_tokens": 1511,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1508,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 37,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1548
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Virginia Woolf",
+              "latencyMs": 1340.7275999999983,
+              "usage": {
+                "input_tokens": 323,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 330
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Virginia Woolf",
+              "latencyMs": 3762.339300000007,
+              "usage": {
+                "input_tokens": 331,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 7,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 338
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: [Emma Bull, Virginia Woolf]\nevidence: birth dates from both biographies; compare years\nblockers: corpus text not supplied\nspent: 25\nreusable_context: Need cited birth-date lines for each person",
+            "forage": "Virginia Woolf — born 25 January 1882 (“Virginia Woolf”), earlier than Emma Bull, born December 13, 1954 (“Emma Bull”).",
+            "build": "Virginia Woolf",
+            "verify": "Virginia Woolf"
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.8,
+            "exactLoss": 1,
+            "taskLoss": 0.19999999999999996
+          }
+        }
+      }
+    },
+    {
+      "id": "5abc0a5d5542993f40c73c64",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Are Freakonomics and In the Realm of the Hackers both American documentaries?",
+      "expected": "no",
+      "executionOrder": [
+        "accuracyLockedMicroHive",
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive"
+      ],
+      "systems": {
+        "accuracyLockedMicroHive": {
+          "answer": "no",
+          "endToEndLatencyMs": 4606.27410000001,
+          "usage": {
+            "inputTokens": 1892,
+            "outputTokens": 19,
+            "reasoningTokens": 0,
+            "totalTokens": 1911,
+            "modelLatencyMs": 4599.429600000003
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "No.",
+              "latencyMs": 2754.7964000000065,
+              "usage": {
+                "input_tokens": 75,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 81
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "No, only Freakonomics is American.",
+              "latencyMs": 1844.6331999999966,
+              "usage": {
+                "input_tokens": 1817,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1814,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 13,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1830
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 81,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 77,
+            "localCompilationLatencyMs": 6.403800000000047,
+            "localLexicalTokensScanned": 1184,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "In the Realm of the Hackers",
+                "text": "In The Realm of the Hackers is a 2003 Australian…",
+                "promptText": "In The Realm of the Hackers is a 2003 Australian…",
+                "estimatedTokens": 13,
+                "truncated": true
+              },
+              {
+                "id": "e2",
+                "title": "Heidi Ewing",
+                "text": "…in 2001, and have collaborated on several documentaries…",
+                "promptText": "Heidi Ewing:…in 2001, and have collaborated on several documentaries…",
+                "estimatedTokens": 18,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 0.6,
+            "intentCoverage": 0.3333333333333333,
+            "atomIntentCoverage": [
+              0,
+              0.3333333333333333
+            ],
+            "structuralChain": false,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "no_structural_chain",
+                "binary_entities_not_covered",
+                "binary_evidence_incomplete"
+              ],
+              "grounded": false,
+              "binary": true
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5abc0a5d5542993f40c73c64",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "directGpt56": {
+          "answer": "No",
+          "endToEndLatencyMs": 5299.221600000004,
+          "usage": {
+            "inputTokens": 61,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 66,
+            "modelLatencyMs": 5299.186799999996
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "No",
+              "latencyMs": 5299.186799999996,
+              "usage": {
+                "input_tokens": 61,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 66
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "No.",
+          "endToEndLatencyMs": 7405.938600000009,
+          "usage": {
+            "inputTokens": 662,
+            "outputTokens": 6,
+            "reasoningTokens": 0,
+            "totalTokens": 668,
+            "modelLatencyMs": 7405.073700000008
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "No.",
+              "latencyMs": 7405.073700000008,
+              "usage": {
+                "input_tokens": 662,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 668
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.8277999999991152,
+            "selectedTitles": [
+              "In the Realm of the Hackers",
+              "Heidi Ewing",
+              "Psycho Realm"
+            ]
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "agentHive": {
+          "answer": "No—only Freakonomics is American.",
+          "endToEndLatencyMs": 16500.4378,
+          "usage": {
+            "inputTokens": 3171,
+            "outputTokens": 164,
+            "reasoningTokens": 0,
+            "totalTokens": 3335,
+            "modelLatencyMs": 16500.081600000034
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: complete\nartifacts: [Freakonomics (film), In the Realm of the Hackers]\nevidence: Verify each film’s country of origin and documentary classification.\nblockers: Corpus text not supplied.\nspent: 2 hops identified\nre",
+              "latencyMs": 5419.2339000000065,
+              "usage": {
+                "input_tokens": 338,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 394
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "status: complete\nartifacts: [\"Freakonomics (film)\", \"In the Realm of the Hackers\"]\nevidence: [\"Freakonomics (film)\" is an American documentary; \"In the Realm of the Hackers\" is an Australian documentary.]\nblockers: none\nspent: 2 documents\nreusable_context: No—only Freakonomics is American.",
+              "latencyMs": 8216.350300000006,
+              "usage": {
+                "input_tokens": 2067,
+                "input_tokens_details": {
+                  "cache_write_tokens": 2064,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 82,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 2149
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "No—only Freakonomics is American.",
+              "latencyMs": 1305.3108000000066,
+              "usage": {
+                "input_tokens": 376,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 13,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 389
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "No—only Freakonomics is American.",
+              "latencyMs": 1559.1866000000155,
+              "usage": {
+                "input_tokens": 390,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 13,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 403
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: complete\nartifacts: [Freakonomics (film), In the Realm of the Hackers]\nevidence: Verify each film’s country of origin and documentary classification.\nblockers: Corpus text not supplied.\nspent: 2 hops identified\nre",
+            "forage": "status: complete\nartifacts: [\"Freakonomics (film)\", \"In the Realm of the Hackers\"]\nevidence: [\"Freakonomics (film)\" is an American documentary; \"In the Realm of the Hackers\" is an Australian documentary.]\nblockers: none\nspent: 2 documents\nreusable_context: No—only Freakonomics is American.",
+            "build": "No—only Freakonomics is American.",
+            "verify": "No—only Freakonomics is American."
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0.33333333333333337,
+            "exactLoss": 1,
+            "taskLoss": 0.6666666666666666
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "no",
+          "endToEndLatencyMs": 1770.8857000000135,
+          "usage": {
+            "inputTokens": 700,
+            "outputTokens": 31,
+            "reasoningTokens": 0,
+            "totalTokens": 731,
+            "modelLatencyMs": 1769.8556000000099
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"No\",\"confidence\":0.98,\"sources\":[\"In the Realm of the Hackers\",\"Heidi Ewing\"]}",
+              "latencyMs": 1769.8556000000099,
+              "usage": {
+                "input_tokens": 700,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 31,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 731
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Are Freakonomics and In the Realm of the Hackers both American documentaries?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 1,
+              "iterations": 1,
+              "inputTokens": 700,
+              "outputTokens": 31,
+              "totalTokens": 731,
+              "latencyMs": 1769.8556000000099
+            },
+            "states": [
+              {
+                "answer": "No",
+                "confidence": 0.98,
+                "evidenceCount": 2,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T18:01:28.664Z",
+                "data": {
+                  "chars": 77,
+                  "scope": "mission:5abc0a5d5542993f40c73c64"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T18:01:28.664Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T18:01:28.665Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T18:01:28.665Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T18:01:30.435Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 700,
+                  "outputTokens": 31,
+                  "totalTokens": 731,
+                  "latencyMs": 1769.8556000000099
+                }
+              },
+              {
+                "name": "on_goal_reached",
+                "at": "2026-08-05T18:01:30.435Z",
+                "data": {
+                  "reason": "goal_reached",
+                  "confidence": 0.98,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T18:01:30.435Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 3,
+                  "missionDeleted": 1
+                }
+              },
+              {
+                "name": "on_output_sanitized",
+                "at": "2026-08-05T18:01:30.435Z",
+                "data": {
+                  "rule": "binary_answer_span"
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5abc0a5d5542993f40c73c64",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": false,
+            "earlyStopped": true,
+            "hookEvents": 8,
+            "memoryEvents": 16,
+            "memoryRecordsBeforeCleanup": 5,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 5
+          },
+          "draft": {
+            "answer": "No",
+            "confidence": 0.98,
+            "sources": [
+              "In the Realm of the Hackers",
+              "Heidi Ewing"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"No\",\"confidence\":0.98,\"sources\":[\"In the Realm of the Hackers\",\"Heidi Ewing\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "5a8db19d5542994ba4e3dd00",
+      "type": "comparison",
+      "level": "hard",
+      "question": "Are Local H and For Against both from the United States?",
+      "expected": "yes",
+      "executionOrder": [
+        "directGpt56",
+        "ragGpt56",
+        "agentHive",
+        "adaptiveMemoryHive",
+        "accuracyLockedMicroHive"
+      ],
+      "systems": {
+        "directGpt56": {
+          "answer": "Yes",
+          "endToEndLatencyMs": 1936.9691999999923,
+          "usage": {
+            "inputTokens": 57,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 62,
+            "modelLatencyMs": 1936.9518000000098
+          },
+          "calls": [
+            {
+              "name": "direct-answer",
+              "text": "Yes",
+              "latencyMs": 1936.9518000000098,
+              "usage": {
+                "input_tokens": 57,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 62
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "ragGpt56": {
+          "answer": "Unknown",
+          "endToEndLatencyMs": 966.5378999999957,
+          "usage": {
+            "inputTokens": 408,
+            "outputTokens": 5,
+            "reasoningTokens": 0,
+            "totalTokens": 413,
+            "modelLatencyMs": 966.3282999999938
+          },
+          "calls": [
+            {
+              "name": "rag-answer",
+              "text": "Unknown",
+              "latencyMs": 966.3282999999938,
+              "usage": {
+                "input_tokens": 408,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 413
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed"
+            }
+          ],
+          "retrieval": {
+            "kind": "BM25",
+            "latencyMs": 0.19450000001234002,
+            "selectedTitles": [
+              "For Against",
+              "Suffrajett",
+              "Amherst, Massachusetts"
+            ]
+          },
+          "quality": {
+            "exactMatch": 0,
+            "tokenF1": 0,
+            "exactLoss": 1,
+            "taskLoss": 1
+          }
+        },
+        "agentHive": {
+          "answer": "Yes.",
+          "endToEndLatencyMs": 8600.894900000014,
+          "usage": {
+            "inputTokens": 2724,
+            "outputTokens": 97,
+            "reasoningTokens": 0,
+            "totalTokens": 2821,
+            "modelLatencyMs": 8600.72530000002
+          },
+          "calls": [
+            {
+              "name": "hive-survey",
+              "text": "status: ready\nartifacts: [Local H, For Against]\nevidence: Need each article’s origin/location statement showing United States.\nblockers: Corpus text not supplied.\nspent: 24 tokens\nreusable_context: Compare both bands’ stated countries of",
+              "latencyMs": 2782.1235999999917,
+              "usage": {
+                "input_tokens": 342,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 56,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 398
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "incomplete",
+              "cell": "survey",
+              "role": "scout",
+              "allocation": 56
+            },
+            {
+              "name": "hive-forage",
+              "text": "Yes. “Local H” identifies the band as American, and “For Against” identifies it as a United States band.",
+              "latencyMs": 2794.3871000000217,
+              "usage": {
+                "input_tokens": 1745,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1742,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 29,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1774
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "forage",
+              "role": "forager",
+              "allocation": 123
+            },
+            {
+              "name": "hive-build",
+              "text": "Yes.",
+              "latencyMs": 1334.3022999999812,
+              "usage": {
+                "input_tokens": 315,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 321
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder",
+              "allocation": 108
+            },
+            {
+              "name": "hive-verify",
+              "text": "Yes.",
+              "latencyMs": 1689.9123000000254,
+              "usage": {
+                "input_tokens": 322,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 328
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard",
+              "allocation": 129
+            }
+          ],
+          "plan": {
+            "totalBudget": 416,
+            "allocations": {
+              "survey": 56,
+              "forage": 123,
+              "build": 108,
+              "verify": 129
+            },
+            "waves": [
+              [
+                "survey"
+              ],
+              [
+                "forage"
+              ],
+              [
+                "build"
+              ],
+              [
+                "verify"
+              ]
+            ]
+          },
+          "cellOutputs": {
+            "survey": "status: ready\nartifacts: [Local H, For Against]\nevidence: Need each article’s origin/location statement showing United States.\nblockers: Corpus text not supplied.\nspent: 24 tokens\nreusable_context: Compare both bands’ stated countries of",
+            "forage": "Yes. “Local H” identifies the band as American, and “For Against” identifies it as a United States band.",
+            "build": "Yes.",
+            "verify": "Yes."
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "adaptiveMemoryHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 2952.549799999979,
+          "usage": {
+            "inputTokens": 1958,
+            "outputTokens": 46,
+            "reasoningTokens": 0,
+            "totalTokens": 2004,
+            "modelLatencyMs": 2945.4964999999793
+          },
+          "calls": [
+            {
+              "name": "adaptive-builder",
+              "text": "{\"answer\":\"Not enough evidence to confirm Local H; For Against is from the United States.\",\"confidence\":0.35,\"sources\":[\"For Against\",\"Suffrajett\"]}",
+              "latencyMs": 1655.4051000000036,
+              "usage": {
+                "input_tokens": 446,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 40,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 486
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "build",
+              "role": "builder"
+            },
+            {
+              "name": "adaptive-guard",
+              "text": "Yes.",
+              "latencyMs": 1290.0913999999757,
+              "usage": {
+                "input_tokens": 1512,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1509,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1518
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "verify",
+              "role": "guard"
+            }
+          ],
+          "controller": {
+            "goal": "Answer the multi-hop question accurately: Are Local H and For Against both from the United States?",
+            "success": {
+              "confidenceMin": 0.9,
+              "evidenceMin": 2
+            },
+            "budget": {
+              "maxModelCalls": 2,
+              "maxIterations": 2,
+              "maxOutputTokens": 416,
+              "maxTotalTokens": 2000,
+              "maxLatencyMs": 15000
+            },
+            "usage": {
+              "calls": 2,
+              "iterations": 2,
+              "inputTokens": 1958,
+              "outputTokens": 46,
+              "totalTokens": 2004,
+              "latencyMs": 2945.4964999999793
+            },
+            "states": [
+              {
+                "answer": "Not enough evidence to confirm Local H; For Against is from the United States.",
+                "confidence": 0.35,
+                "evidenceCount": 2,
+                "conflict": false
+              },
+              {
+                "answer": "Yes.",
+                "confidence": 0.9,
+                "evidenceCount": 10,
+                "conflict": false
+              }
+            ],
+            "events": [
+              {
+                "name": "on_input_validated",
+                "at": "2026-08-05T18:01:41.941Z",
+                "data": {
+                  "chars": 56,
+                  "scope": "mission:5a8db19d5542994ba4e3dd00"
+                }
+              },
+              {
+                "name": "before_tool_call",
+                "at": "2026-08-05T18:01:41.941Z",
+                "data": {
+                  "tool": "bm25_retrieve"
+                }
+              },
+              {
+                "name": "after_retrieval",
+                "at": "2026-08-05T18:01:41.941Z",
+                "data": {
+                  "tool": "bm25_retrieve",
+                  "candidates": 10
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T18:01:41.941Z",
+                "data": {
+                  "cell": "builder",
+                  "evidenceCount": 3
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T18:01:43.597Z",
+                "data": {
+                  "calls": 1,
+                  "iterations": 1,
+                  "inputTokens": 446,
+                  "outputTokens": 40,
+                  "totalTokens": 486,
+                  "latencyMs": 1655.4051000000036
+                }
+              },
+              {
+                "name": "on_low_confidence",
+                "at": "2026-08-05T18:01:43.597Z",
+                "data": {
+                  "confidence": 0.35,
+                  "evidenceCount": 2
+                }
+              },
+              {
+                "name": "before_cell_run",
+                "at": "2026-08-05T18:01:43.603Z",
+                "data": {
+                  "cell": "guard",
+                  "evidenceCount": 10
+                }
+              },
+              {
+                "name": "after_model_call",
+                "at": "2026-08-05T18:01:44.893Z",
+                "data": {
+                  "calls": 2,
+                  "iterations": 2,
+                  "inputTokens": 1958,
+                  "outputTokens": 46,
+                  "totalTokens": 2004,
+                  "latencyMs": 2945.4964999999793
+                }
+              },
+              {
+                "name": "on_loop_stopped",
+                "at": "2026-08-05T18:01:44.893Z",
+                "data": {
+                  "reason": "goal_reached"
+                }
+              },
+              {
+                "name": "on_session_end",
+                "at": "2026-08-05T18:01:44.893Z",
+                "data": {
+                  "agentDeleted": 1,
+                  "teamDeleted": 10,
+                  "missionDeleted": 1
+                }
+              },
+              {
+                "name": "on_output_sanitized",
+                "at": "2026-08-05T18:01:44.893Z",
+                "data": {
+                  "rule": "binary_answer_span"
+                }
+              }
+            ]
+          },
+          "monitoring": {
+            "traceId": "mission:5a8db19d5542994ba4e3dd00",
+            "inputValidated": true,
+            "allowedTools": [
+              "bm25_retrieve"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0,
+            "repairTriggered": true,
+            "earlyStopped": false,
+            "hookEvents": 11,
+            "memoryEvents": 38,
+            "memoryRecordsBeforeCleanup": 12,
+            "memoryRecordsAfterCleanup": 0,
+            "deletions": 12
+          },
+          "draft": {
+            "answer": "Not enough evidence to confirm Local H; For Against is from the United States.",
+            "confidence": 0.35,
+            "sources": [
+              "For Against",
+              "Suffrajett"
+            ],
+            "parseSucceeded": true,
+            "raw": "{\"answer\":\"Not enough evidence to confirm Local H; For Against is from the United States.\",\"confidence\":0.35,\"sources\":[\"For Against\",\"Suffrajett\"]}"
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        },
+        "accuracyLockedMicroHive": {
+          "answer": "yes",
+          "endToEndLatencyMs": 2657.685300000012,
+          "usage": {
+            "inputTokens": 1562,
+            "outputTokens": 11,
+            "reasoningTokens": 0,
+            "totalTokens": 1573,
+            "modelLatencyMs": 2657.0282000000007
+          },
+          "calls": [
+            {
+              "name": "micro-builder",
+              "text": "Yes.",
+              "latencyMs": 988.1949000000022,
+              "usage": {
+                "input_tokens": 74,
+                "input_tokens_details": {
+                  "cache_write_tokens": 0,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 6,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 80
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "micro-build",
+              "role": "builder"
+            },
+            {
+              "name": "micro-accuracy-fallback",
+              "text": "Yes",
+              "latencyMs": 1668.8332999999984,
+              "usage": {
+                "input_tokens": 1488,
+                "input_tokens_details": {
+                  "cache_write_tokens": 1485,
+                  "cached_tokens": 0
+                },
+                "output_tokens": 5,
+                "output_tokens_details": {
+                  "reasoning_tokens": 0
+                },
+                "total_tokens": 1493
+              },
+              "returnedModel": "gpt-5.6-sol",
+              "status": "completed",
+              "cell": "accuracy-repair",
+              "role": "guard"
+            }
+          ],
+          "micro": {
+            "targetTokens": 100,
+            "actualCompactCallTokens": 80,
+            "compactCallMetTarget": true,
+            "estimatedCompactCallTokens": 79,
+            "localCompilationLatencyMs": 0.5424000000057276,
+            "localLexicalTokensScanned": 984,
+            "evidenceAtoms": [
+              {
+                "id": "e1",
+                "title": "For Against",
+                "text": "For Against is a United States post-punk/dream pop band from Lincoln, Nebraska.",
+                "promptText": "For Against is a United States post-punk/dream pop band from Lincoln, Nebraska.",
+                "estimatedTokens": 20,
+                "truncated": false
+              },
+              {
+                "id": "e2",
+                "title": "Local H",
+                "text": "The members all met in high school in 1987 and founded Local…",
+                "promptText": "Local H:The members all met in high school in 1987 and founded Local…",
+                "estimatedTokens": 18,
+                "truncated": true
+              }
+            ],
+            "queryCoverage": 1,
+            "intentCoverage": 1,
+            "atomIntentCoverage": [
+              1,
+              0
+            ],
+            "structuralChain": true,
+            "accuracyLock": {
+              "accepted": false,
+              "reasons": [
+                "binary_evidence_incomplete"
+              ],
+              "grounded": false,
+              "binary": true
+            },
+            "escalated": true
+          },
+          "monitoring": {
+            "traceId": "micro:5a8db19d5542994ba4e3dd00",
+            "inputValidated": true,
+            "allowedTools": [
+              "atomic_lexical_retrieval"
+            ],
+            "toolCalls": 1,
+            "policyDenials": 0
+          },
+          "quality": {
+            "exactMatch": 1,
+            "tokenF1": 1,
+            "exactLoss": 0,
+            "taskLoss": 0
+          }
+        }
+      }
+    }
+  ]
+}
