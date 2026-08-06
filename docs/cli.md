@@ -13,9 +13,15 @@ nestra query --project ID --question "..." [--mode auto|retrieval] [--router-mod
 nestra inspect --project ID
 nestra list
 nestra serve [--host HOST] [--port PORT] [--router-model model.json]
+nestra integrations install [--target codex|claude|gemini] [--dry-run] [--force]
+nestra integrations status [--target codex|claude|gemini]
 ```
 
 All object results are JSON, making the CLI suitable for shell pipelines and CI fixtures.
+
+With no `--target`, `integrations install` installs all supported user-level adapters. Claude Code and Gemini CLI expose `/nestra`; Codex exposes `$nestra` and lists it under `/skills`. Installation is idempotent. A modified existing adapter causes a fail-closed conflict unless `--force` is supplied, in which case NESTRA creates a timestamped backup first.
+
+These prompt adapters make NESTRA convenient inside an AI CLI, but the host CLI still consumes its own model tokens. The Python runtime and HTTP gateway remain the deployment surfaces for placing NESTRA before an application's model call.
 
 Without installation, the equivalent entry point is `python -m nestra` when `src` is on `PYTHONPATH`.
 

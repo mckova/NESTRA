@@ -1,0 +1,10 @@
+description = "Route a question through the local NESTRA evidence layer"
+prompt = """
+Use the installed `nestra` CLI for this request. Do not simulate its routing or answer from memory.
+
+Request: {{args}}
+
+Run `nestra list`. Use the only project when exactly one exists; otherwise prefer an exact current-directory-name match or ask the user which project to use. Then run `nestra query --project <id> --question <request> --mode auto`.
+
+Report the answer; when `answer` is null, present the returned evidence without inventing a synthesis. Include route, status, verified, citations, model calls, total tokens, and latency. If NESTRA blocks, needs review, or fails, say so without silently bypassing it. Never expose credentials or claim that the host AI CLI used zero tokens.
+"""

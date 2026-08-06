@@ -25,6 +25,19 @@ nestra query --project casting --question "Show the evidence sources" --mode ret
 
 הפקודה האחרונה אינה דורשת מפתח API וצורכת אפס טוקני LLM. למסלולי generation מגדירים `OPENAI_API_KEY`. ברירות המחדל ממפות את התפקידים ל־GPT-5.6 Luna עבור Micro, Terra עבור Meso ו־Sol עבור Full, אך ממשק הספק ניתן להחלפה.
 
+## פקודה טבעית ב־AI CLI
+
+מתקינים את המנוע ישירות מ־GitHub ואז את המתאמים האישיים:
+
+```powershell
+pipx install git+https://github.com/mckova/NESTRA.git
+nestra integrations install
+```
+
+לאחר מכן Claude Code ו־Gemini CLI מציגים `/nestra`. ב־Codex תחביר ה־Skills הרשמי הוא `$nestra`, או בחירת NESTRA מתוך `/skills`. אפשר לבדוק את מצב ההתקנה עם `nestra integrations status`. קבצים קיימים ששונו אינם נדרסים; שימוש מפורש ב־`--force` יוצר להם גיבוי לפני העדכון.
+
+המתאמים הם מעטפת דקה שמפעילה את מנוע NESTRA המקומי ומציגה ראיות, אימות, מסלול, latency וצריכת טוקני ספק. הם אינם הופכים את NESTRA לאייג'נט ואינם מבטלים את הטוקנים שמודל ה־AI CLI עצמו כבר צורך. כדי לחסוך לפני קריאת מודל, משלבים את ספריית הפייתון או את ה־HTTP gateway בשכבה שלפני ה־LLM באפליקציה.
+
 ## הנתב הלומד
 
 קיים מודל Logistic Regression מקומי ואופציונלי שמעריך מתי Micro עשוי להיות בטוח. הוא משתמש ב־15 מאפייני ניתוב מספריים, אינו צורך טוקנים ואינו שומר שאלות או ראיות גולמיות בקובץ המודל. חסימה, אחזור בלבד, אמון, רגישות, prompt injection ובדיקת התשובה נשארים דטרמיניסטיים ויכולים להטיל veto על המודל.

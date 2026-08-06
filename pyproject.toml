@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nestra-ai"
-version = "2.0.0"
+version = "2.1.0"
 description = "An evidence-aware Python gateway that routes between zero-token retrieval and accuracy-guarded LLM tiers."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -48,7 +48,13 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-nestra = ["models/*.json"]
+nestra = [
+  "models/*.json",
+  "resources/skills/nestra/*.md",
+  "resources/skills/nestra/agents/*.yaml",
+  "resources/claude/skills/nestra/*.md",
+  "resources/gemini/commands/*.toml",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

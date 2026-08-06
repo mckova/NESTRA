@@ -233,7 +233,7 @@ def test_http_gateway_health_auth_and_zero_token_retrieval(tmp_path: Path):
     base = f"http://127.0.0.1:{server.server_port}"
     try:
         health = json.loads(urllib.request.urlopen(f"{base}/health").read())
-        assert health["version"] == "2.0.0"
+        assert health["version"] == "2.1.0"
         try:
             urllib.request.urlopen(f"{base}/v1/projects")
         except urllib.error.HTTPError as error:

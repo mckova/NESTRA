@@ -9,3 +9,5 @@ recursive-include models *.json *.md
 recursive-include scripts *.py
 recursive-include benchmarks *.py *.json *.md
 recursive-include tests *.py
+recursive-include src/nestra/resources *.md *.yaml *.toml
+recursive-include .agents *.md *.yaml

@@ -1,0 +1,6 @@
+interface:
+  display_name: "NESTRA"
+  short_description: "Route requests through NESTRA safely"
+  default_prompt: "Use $nestra to answer this request through the cheapest verified NESTRA route."
+policy:
+  allow_implicit_invocation: false

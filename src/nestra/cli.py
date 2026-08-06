@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, TextIO
 
+from .integrations import SUPPORTED_INTEGRATIONS, install_integrations, integration_status
 from .providers import create_openai_responses_provider
 from .runtime import NestraRuntime
 from .server import create_nestra_server
@@ -42,6 +43,14 @@ def build_parser() -> argparse.ArgumentParser:
     serve.add_argument("--port", type=int, default=8787)
     serve.add_argument("--token")
     serve.add_argument("--allow-unauthenticated", action="store_true")
+    integrations = sub.add_parser("integrations", help="Install native AI CLI commands.")
+    integration_actions = integrations.add_subparsers(dest="integration_action", required=True)
+    install = integration_actions.add_parser("install", help="Install or update adapters.")
+    install.add_argument("--target", action="append", choices=SUPPORTED_INTEGRATIONS)
+    install.add_argument("--force", action="store_true", help="Back up and replace modified files.")
+    install.add_argument("--dry-run", action="store_true")
+    status = integration_actions.add_parser("status", help="Inspect installed adapters.")
+    status.add_argument("--target", action="append", choices=SUPPORTED_INTEGRATIONS)
     return parser
 
 
@@ -58,6 +67,14 @@ def run_cli(
     stderr = stderr or sys.stderr
     try:
         args = build_parser().parse_args(argv)
+        if args.command == "integrations":
+            targets = args.target or list(SUPPORTED_INTEGRATIONS)
+            if args.integration_action == "install":
+                records = install_integrations(targets, force=args.force, dry_run=args.dry_run)
+            else:
+                records = integration_status(targets)
+            _output(stdout, {"integrations": records})
+            return 0
         store = (
             runtime.store
             if runtime

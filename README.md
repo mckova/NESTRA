@@ -44,6 +44,19 @@ python scripts/validate_release.py
 
 The distribution name is `nestra-ai`; the import package is `nestra`. The repository is ready to build as a wheel and source distribution, but does not claim that a PyPI release already exists.
 
+## Native AI CLI command
+
+Install the engine from GitHub with `pipx`, then install NESTRA's user-level adapters:
+
+```bash
+pipx install git+https://github.com/mckova/NESTRA.git
+nestra integrations install
+```
+
+This makes `/nestra` available in Claude Code and Gemini CLI. Codex uses the current Agent Skills syntax: invoke `$nestra`, or open `/skills` and choose NESTRA. Inspect without changing files with `nestra integrations status` or `nestra integrations install --dry-run`. Existing modified commands are never overwritten unless `--force` is supplied; forced updates create timestamped backups.
+
+The adapters are deliberately thin: they ask the host AI CLI to call the local `nestra` executable and surface its evidence, verification state, route, latency, and provider-token usage. They do not turn NESTRA into an agent and do not make the host CLI's own model tokens disappear. For true pre-model savings, integrate the Python runtime or HTTP gateway before the application's LLM call.
+
 ## Five-minute CLI flow
 
 ```bash

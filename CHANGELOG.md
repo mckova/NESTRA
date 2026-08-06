@@ -2,6 +2,17 @@
 
 All notable changes follow Keep a Changelog conventions. The project uses semantic versioning for its Python, CLI, storage, and HTTP contracts.
 
+## [2.1.0] - 2026-08-06
+
+### Added
+
+- User-level NESTRA integrations for Codex Agent Skills, Claude Code `/nestra`, and Gemini CLI `/nestra`.
+- Idempotent `nestra integrations install/status` commands with dry-run, conflict protection, and timestamped backups for forced updates.
+
+### Security
+
+- AI CLI adapters never embed credentials, never silently bypass NESTRA, and do not claim that host-CLI model usage is part of NESTRA's zero-provider-token retrieval result.
+
 ## [2.0.0] - 2026-08-06
 
 ### Changed
