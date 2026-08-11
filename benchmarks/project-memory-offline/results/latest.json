@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-06T12:57:05.425598Z",
+  "generatedAt": "2026-08-11T09:12:27.959324Z",
   "purpose": "Deterministic routing and safety evaluation only; this does not measure model answer accuracy.",
   "implementation": "python",
-  "cases": 7,
-  "passed": 7,
+  "cases": 8,
+  "passed": 8,
   "providerTokens": 0,
   "rows": [
     {
@@ -15,8 +15,8 @@
       "expectedReasons": [],
       "actualReasons": [],
       "missingReasons": [],
-      "ingestionLatencyMs": 2.2770999930799007,
-      "recallLatencyMs": 1.4849998988211155,
+      "ingestionLatencyMs": 1.0670000046957284,
+      "recallLatencyMs": 0.44409999100025743,
       "providerTokens": 0,
       "stats": {
         "documents": 2,
@@ -41,8 +41,8 @@
         "no_structural_chain"
       ],
       "missingReasons": [],
-      "ingestionLatencyMs": 0.5171999800950289,
-      "recallLatencyMs": 0.26439991779625416,
+      "ingestionLatencyMs": 0.3132999991066754,
+      "recallLatencyMs": 0.10850001126527786,
       "providerTokens": 0,
       "stats": {
         "documents": 1,
@@ -64,8 +64,8 @@
         "untrusted_evidence"
       ],
       "missingReasons": [],
-      "ingestionLatencyMs": 1.029800157994032,
-      "recallLatencyMs": 0.6167998071759939,
+      "ingestionLatencyMs": 0.48970000352710485,
+      "recallLatencyMs": 0.16490000416524708,
       "providerTokens": 0,
       "stats": {
         "documents": 2,
@@ -87,8 +87,8 @@
         "sensitive_evidence"
       ],
       "missingReasons": [],
-      "ingestionLatencyMs": 0.9212000295519829,
-      "recallLatencyMs": 0.4485000390559435,
+      "ingestionLatencyMs": 0.49640001088846475,
+      "recallLatencyMs": 0.16170000890269876,
       "providerTokens": 0,
       "stats": {
         "documents": 2,
@@ -110,8 +110,8 @@
         "no_structural_chain"
       ],
       "missingReasons": [],
-      "ingestionLatencyMs": 0.8167000487446785,
-      "recallLatencyMs": 0.42559998109936714,
+      "ingestionLatencyMs": 0.4158999945502728,
+      "recallLatencyMs": 0.14770000416319817,
       "providerTokens": 0,
       "stats": {
         "documents": 2,
@@ -133,8 +133,31 @@
         "evidence_exceeds_micro_budget"
       ],
       "missingReasons": [],
-      "ingestionLatencyMs": 0.8127999026328325,
-      "recallLatencyMs": 0.49640005454421043,
+      "ingestionLatencyMs": 0.46269998711068183,
+      "recallLatencyMs": 0.13390000094659626,
+      "providerTokens": 0,
+      "stats": {
+        "documents": 2,
+        "facts": 2,
+        "entities": 3,
+        "relations": 2,
+        "lexicalTokensScanned": 19
+      }
+    },
+    {
+      "id": "irrelevant-retrieval",
+      "expectedRoute": "blocked",
+      "actualRoute": "blocked",
+      "passed": true,
+      "expectedReasons": [
+        "insufficient_relevant_evidence"
+      ],
+      "actualReasons": [
+        "insufficient_relevant_evidence"
+      ],
+      "missingReasons": [],
+      "ingestionLatencyMs": 0.43310000910423696,
+      "recallLatencyMs": 0.14130001363810152,
       "providerTokens": 0,
       "stats": {
         "documents": 2,
@@ -152,8 +175,8 @@
       "expectedReasons": [],
       "actualReasons": [],
       "missingReasons": [],
-      "ingestionLatencyMs": 0.9127999655902386,
-      "recallLatencyMs": 0.49629993736743927,
+      "ingestionLatencyMs": 0.5487000016728416,
+      "recallLatencyMs": 0.17349999689031392,
       "providerTokens": 0,
       "stats": {
         "documents": 2,

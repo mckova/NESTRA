@@ -1,6 +1,6 @@
 # Project Memory offline gate suite
 
-This deterministic Python suite checks routing behavior without a model or network connection. It covers a valid trusted bridge, missing evidence, untrusted evidence, sensitive evidence, an unlinked pair, an evidence-budget overrun, and a Hebrew bridge. Untrusted or sensitive evidence must route to `blocked`, not to a model fallback.
+This deterministic Python suite checks routing behavior without a model or network connection. It covers a valid trusted bridge, missing evidence, untrusted evidence, sensitive evidence, an unlinked pair, an evidence-budget overrun, an irrelevant retrieval request, and a Hebrew bridge. Untrusted, sensitive, or topically unrelated evidence must route to `blocked`, not be labeled verified or sent to a model fallback.
 
 ```bash
 python benchmarks/project_memory_offline/run.py

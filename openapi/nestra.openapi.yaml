@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NESTRA Gateway API
-  version: 2.1.0
+  version: 2.1.1
   description: Evidence-aware routing between retrieval-only and guarded LLM tiers.
 servers:
   - url: http://127.0.0.1:8787
@@ -19,24 +19,47 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [status, service, version]
                 properties:
                   status: { const: ok }
                   service: { const: nestra }
                   version: { type: string }
+                additionalProperties: false
   /v1/projects:
     get:
       operationId: listProjects
       responses:
         "200":
           description: Stored project identifiers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [projects]
+                properties:
+                  projects:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProjectId" }
+                additionalProperties: false
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
   /v1/projects/{projectId}:
     get:
       operationId: inspectProject
       parameters:
         - $ref: "#/components/parameters/ProjectId"
       responses:
-        "200": { description: Project metadata and compilation statistics. }
-        "404": { $ref: "#/components/responses/ErrorResponse" }
+        "200":
+          description: Project metadata and compilation statistics.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProjectInspection" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
   /v1/projects/{projectId}/ingest:
     post:
       operationId: ingestProject
@@ -55,16 +78,36 @@ paths:
                   minItems: 1
                   items: { $ref: "#/components/schemas/Document" }
                 defaultTrust: { enum: [trusted, untrusted] }
+              additionalProperties: false
       responses:
-        "201": { description: Project memory compiled and persisted. }
-        "400": { $ref: "#/components/responses/ErrorResponse" }
+        "201":
+          description: Project memory compiled and persisted.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IngestResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "413": { $ref: "#/components/responses/PayloadTooLarge" }
+        "415": { $ref: "#/components/responses/UnsupportedMediaType" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
   /v1/route:
     post:
       operationId: planRoute
       requestBody:
         $ref: "#/components/requestBodies/QueryBody"
       responses:
-        "200": { description: Route decision without a model call. }
+        "200":
+          description: Route decision without a model call.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RoutePlan" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "413": { $ref: "#/components/responses/PayloadTooLarge" }
+        "415": { $ref: "#/components/responses/UnsupportedMediaType" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
   /v1/query:
     post:
       operationId: query
@@ -77,13 +120,26 @@ paths:
             application/json:
               schema:
                 $ref: "../schemas/query-result.schema.json"
-        "429": { $ref: "#/components/responses/ErrorResponse" }
-        "502": { $ref: "#/components/responses/ErrorResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "413": { $ref: "#/components/responses/PayloadTooLarge" }
+        "415": { $ref: "#/components/responses/UnsupportedMediaType" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "502": { $ref: "#/components/responses/ProviderError" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+        "500": { $ref: "#/components/responses/InternalError" }
   /v1/metrics:
     get:
       operationId: metrics
       responses:
-        "200": { description: Aggregate route, latency, call, token, and alert counters. }
+        "200":
+          description: Aggregate route, latency, call, token, and alert counters.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Metrics" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "500": { $ref: "#/components/responses/InternalError" }
 components:
   securitySchemes:
     bearerAuth:
@@ -94,32 +150,152 @@ components:
       name: projectId
       in: path
       required: true
-      schema: { type: string, pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$" }
+      schema: { $ref: "#/components/schemas/ProjectId" }
   schemas:
+    ProjectId:
+      type: string
+      minLength: 1
+      maxLength: 64
+      pattern: "^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,62}[A-Za-z0-9])?$"
     Document:
       type: object
-      required: [title, text]
+      required: [title]
+      anyOf:
+        - required: [text]
+        - required: [sentences]
       properties:
-        title: { type: string }
-        text: { type: string }
+        id: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        text: { type: string, minLength: 1 }
+        sentences:
+          type: array
+          minItems: 1
+          items: { type: string, minLength: 1 }
         sourceUri: { type: [string, "null"] }
         trust: { enum: [trusted, untrusted] }
         sensitivity: { type: number, minimum: 0, maximum: 1 }
+        sourceQuality: { type: number, minimum: 0, maximum: 1 }
+      additionalProperties: true
+    ProjectStats:
+      type: object
+      required: [documents, facts, entities, relations, lexicalTokensScanned]
+      properties:
+        documents: { type: integer, minimum: 0 }
+        facts: { type: integer, minimum: 0 }
+        entities: { type: integer, minimum: 0 }
+        relations: { type: integer, minimum: 0 }
+        lexicalTokensScanned: { type: integer, minimum: 0 }
+      additionalProperties: false
+    ProjectInspection:
+      type: object
+      required: [schemaVersion, projectId, compiledAt, stats, bytes, updatedAt]
+      properties:
+        schemaVersion: { const: 1 }
+        projectId: { $ref: "#/components/schemas/ProjectId" }
+        compiledAt: { type: string, format: date-time }
+        stats: { $ref: "#/components/schemas/ProjectStats" }
+        bytes: { type: integer, minimum: 0 }
+        updatedAt: { type: string, format: date-time }
+      additionalProperties: false
+    IngestResponse:
+      type: object
+      required: [projectId, stats]
+      properties:
+        projectId: { $ref: "#/components/schemas/ProjectId" }
+        stats: { $ref: "#/components/schemas/ProjectStats" }
+      additionalProperties: false
+    Evidence:
+      type: object
+      required: [id, title, text, documentId, sourceUri, retrievalScore, provenance]
+      properties:
+        id: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        text: { type: string, minLength: 1 }
+        documentId: { type: string, minLength: 1 }
+        sourceUri: { type: [string, "null"] }
+        retrievalScore: { type: number }
+        provenance:
+          type: object
+          required: [projectId, documentId, title, contentHash, sentenceIndex, sourceUri]
+          properties:
+            projectId: { $ref: "#/components/schemas/ProjectId" }
+            documentId: { type: string, minLength: 1 }
+            title: { type: string, minLength: 1 }
+            contentHash: { type: string, minLength: 1 }
+            sentenceIndex: { type: integer, minimum: 0 }
+            sourceUri: { type: [string, "null"] }
+          additionalProperties: false
+      additionalProperties: false
+    RouterDecision:
+      type: object
+      required: [source, deterministicRoute, selectedRoute, vetoReason]
+      properties:
+        source: { enum: [deterministic, learned] }
+        deterministicRoute: { enum: [blocked, retrieval, micro, meso, full] }
+        selectedRoute: { enum: [blocked, retrieval, micro, meso, full] }
+        modelId: { type: [string, "null"] }
+        microSafeProbability: { type: number, minimum: 0, maximum: 1 }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        thresholds: { type: object, additionalProperties: { type: number } }
+        featureSchemaVersion: { type: integer, minimum: 1 }
+        vetoReason: { type: [string, "null"] }
+      additionalProperties: false
+    RoutePlan:
+      type: object
+      required:
+        [projectId, route, authorized, reasons, evidence, estimatedEvidenceTokens, providerRequired, router]
+      properties:
+        projectId: { $ref: "#/components/schemas/ProjectId" }
+        route: { enum: [blocked, retrieval, micro, meso, full] }
+        authorized: { type: boolean }
+        reasons: { type: array, items: { type: string } }
+        evidence: { type: array, items: { $ref: "#/components/schemas/Evidence" } }
+        estimatedEvidenceTokens: { type: integer, minimum: 0 }
+        providerRequired: { type: boolean }
+        router: { $ref: "#/components/schemas/RouterDecision" }
+      additionalProperties: false
+    Metrics:
+      type: object
+      required:
+        [generatedAt, requests, routes, blocked, errors, verified, averageLatencyMs,
+         averageModelCalls, totalTokens, averageTokens, routerSources, routerModels,
+         routerVetoes, alerts]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        requests: { type: integer, minimum: 0 }
+        routes: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+        blocked: { type: integer, minimum: 0 }
+        errors: { type: integer, minimum: 0 }
+        verified: { type: integer, minimum: 0 }
+        averageLatencyMs: { type: number, minimum: 0 }
+        averageModelCalls: { type: number, minimum: 0 }
+        totalTokens: { type: integer, minimum: 0 }
+        averageTokens: { type: number, minimum: 0 }
+        routerSources: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+        routerModels: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+        routerVetoes: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+        alerts: { type: object, additionalProperties: { type: integer, minimum: 0 } }
+      additionalProperties: false
     Query:
       type: object
       required: [projectId, question]
       properties:
-        projectId: { type: string }
-        question: { type: string }
+        projectId: { $ref: "#/components/schemas/ProjectId" }
+        question: { type: string, minLength: 1, maxLength: 4000 }
         mode: { enum: [auto, retrieval] }
+      additionalProperties: false
     Error:
       type: object
+      required: [error]
       properties:
         error:
           type: object
+          required: [code, message]
           properties:
-            code: { type: string }
-            message: { type: string }
+            code: { type: string, minLength: 1 }
+            message: { type: string, minLength: 1 }
+          additionalProperties: false
+      additionalProperties: false
   requestBodies:
     QueryBody:
       required: true
@@ -128,9 +304,32 @@ components:
           schema:
             $ref: "#/components/schemas/Query"
   responses:
-    ErrorResponse:
-      description: Request failed.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: Invalid request.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Unauthorized:
+      description: Bearer authentication failed.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NotFound:
+      description: Resource not found.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    PayloadTooLarge:
+      description: Request body exceeds the configured limit.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    UnsupportedMediaType:
+      description: Content-Type must be application/json.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After: { schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    ProviderError:
+      description: Upstream model provider failed.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Unavailable:
+      description: Concurrency capacity is exhausted.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    InternalError:
+      description: Internal server error.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }

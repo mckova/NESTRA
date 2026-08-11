@@ -34,6 +34,15 @@ pipx install git+https://github.com/mckova/NESTRA.git
 nestra integrations install
 ```
 
+אם מדיניות Application Control של Windows חוסמת את `nestra.exe` ש־pipx יצר, אפשר לבצע את התקנת המתאמים פעם אחת דרך מפרש הפייתון של הסביבה:
+
+```powershell
+$pipxVenvs = pipx environment --value PIPX_LOCAL_VENVS
+& (Join-Path $pipxVenvs "nestra-ai\Scripts\python.exe") -m nestra integrations install
+```
+
+המתאמים המותקנים שומרים גם פקודת גיבוי של `python -m nestra`, ולכן פקודת ה־slash או ה־skill אינה תלויה ב־launcher החסום.
+
 לאחר מכן Claude Code ו־Gemini CLI מציגים `/nestra`. ב־Codex תחביר ה־Skills הרשמי הוא `$nestra`, או בחירת NESTRA מתוך `/skills`. אפשר לבדוק את מצב ההתקנה עם `nestra integrations status`. קבצים קיימים ששונו אינם נדרסים; שימוש מפורש ב־`--force` יוצר להם גיבוי לפני העדכון.
 
 המתאמים הם מעטפת דקה שמפעילה את מנוע NESTRA המקומי ומציגה ראיות, אימות, מסלול, latency וצריכת טוקני ספק. הם אינם הופכים את NESTRA לאייג'נט ואינם מבטלים את הטוקנים שמודל ה־AI CLI עצמו כבר צורך. כדי לחסוך לפני קריאת מודל, משלבים את ספריית הפייתון או את ה־HTTP gateway בשכבה שלפני ה־LLM באפליקציה.

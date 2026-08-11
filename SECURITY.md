@@ -16,10 +16,14 @@ Include the affected version, impact, minimal reproduction with synthetic data, 
 
 ## Deployment boundary
 
-The bundled HTTP server provides a reference bearer boundary, request/body/rate/concurrency limits, secure response headers, redacted auditing, and guarded provider calls. It does not replace TLS, user identity, tenant authorization, a secret manager, process/network isolation, immutable audit storage, or disaster recovery.
+The bundled HTTP server provides a reference bearer boundary, strict body framing, per-client request limits across every `/v1/*` endpoint, bounded request workers/socket timeouts, secure response headers, redacted auditing, and guarded provider calls. It does not replace TLS, user identity, tenant authorization, a secret manager, process/network isolation, immutable audit storage, or disaster recovery.
 
 External retrieval output is untrusted by default. Never mark it trusted solely because a similarity score is high. Do not send evidence rejected for trust, sensitivity, or injection risk to a fallback model.
 
 Learned-router artifacts are opt-in and cannot bypass deterministic authorization or answer guards. Treat artifact replacement as a supply-chain change: review provenance, pin the model ID, and test route distribution before deployment.
+
+Structured model output is not considered verified merely because it contains valid citation IDs or a high self-reported confidence. Meso and Full answers must also pass deterministic lexical and numeric support checks against the cited evidence.
+
+Project-memory snapshots are treated as untrusted serialized state when restored: IDs, hashes, provenance, sentence reconstruction, entity/fact links, relations, statistics, and exact schema fields are revalidated. Public Micro results expose the same bounded evidence contract as other routes and omit compiler-only prompt and original-text fields.
 
 See the full [threat model](docs/threat-model.md) and [deployment checklist](docs/gateway.md).

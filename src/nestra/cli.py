@@ -62,7 +62,7 @@ def run_cli(
     stderr: TextIO | None = None,
     runtime: NestraRuntime | None = None,
 ) -> int:
-    env = env or os.environ
+    env = os.environ if env is None else env
     stdout = stdout or sys.stdout
     stderr = stderr or sys.stderr
     try:
@@ -111,13 +111,15 @@ def run_cli(
                     api_key=env.get("OPENAI_API_KEY") or env.get("OPENAI_KEY"),
                     endpoint=args.endpoint or "https://api.openai.com/v1/responses",
                     max_retries=args.retries if args.retries is not None else 1,
+                    use_environment=False,
                 )
             _output(stdout, nestra.query(**input_, actor_id="cli"))
             return 0
         if args.command == "serve":
             if nestra.provider is None and (env.get("OPENAI_API_KEY") or env.get("OPENAI_KEY")):
                 nestra.provider = create_openai_responses_provider(
-                    api_key=env.get("OPENAI_API_KEY") or env.get("OPENAI_KEY")
+                    api_key=env.get("OPENAI_API_KEY") or env.get("OPENAI_KEY"),
+                    use_environment=False,
                 )
             token = env.get("NESTRA_API_TOKEN") or args.token
             server = create_nestra_server(

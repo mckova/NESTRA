@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import os
+import shlex
+import sys
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -36,17 +38,20 @@ def install_integrations(
     home: str | Path | None = None,
     force: bool = False,
     dry_run: bool = False,
+    python_executable: str | Path | None = None,
 ) -> list[dict[str, object]]:
     """Install native NESTRA adapters without silently replacing existing files."""
 
     selected = _validate_targets(targets)
     root = Path(home).expanduser().resolve() if home is not None else Path.home().resolve()
+    command = _module_command(python_executable)
     artifacts = [artifact for target in selected for artifact in _artifacts(target, root)]
     conflicts = [
         artifact.destination
         for artifact in artifacts
         if artifact.destination.exists()
-        and artifact.destination.read_text(encoding="utf-8") != _resource_text(artifact.resource)
+        and artifact.destination.read_text(encoding="utf-8")
+        != _render_resource(artifact.resource, command)
     ]
     if conflicts and not force:
         rendered = ", ".join(str(path) for path in conflicts)
@@ -62,7 +67,7 @@ def install_integrations(
         paths: list[str] = []
         backups: list[str] = []
         for artifact in target_artifacts:
-            content = _resource_text(artifact.resource)
+            content = _render_resource(artifact.resource, command)
             paths.append(str(artifact.destination))
             if (
                 artifact.destination.exists()
@@ -100,12 +105,16 @@ def install_integrations(
 
 
 def integration_status(
-    targets: Iterable[str] | None = None, *, home: str | Path | None = None
+    targets: Iterable[str] | None = None,
+    *,
+    home: str | Path | None = None,
+    python_executable: str | Path | None = None,
 ) -> list[dict[str, object]]:
     """Return whether every native adapter matches the packaged NESTRA version."""
 
     selected = _validate_targets(targets)
     root = Path(home).expanduser().resolve() if home is not None else Path.home().resolve()
+    command = _module_command(python_executable)
     records: list[dict[str, object]] = []
     for target in selected:
         artifacts = _artifacts(target, root)
@@ -113,8 +122,8 @@ def integration_status(
         for artifact in artifacts:
             if not artifact.destination.exists():
                 states.append("missing")
-            elif artifact.destination.read_text(encoding="utf-8") == _resource_text(
-                artifact.resource
+            elif artifact.destination.read_text(encoding="utf-8") == _render_resource(
+                artifact.resource, command
             ):
                 states.append("installed")
             else:
@@ -173,6 +182,16 @@ def _resource_text(relative: str) -> str:
     for part in relative.split("/"):
         resource = resource.joinpath(part)
     return resource.read_text(encoding="utf-8")
+
+
+def _render_resource(relative: str, command: str) -> str:
+    return _resource_text(relative).replace("python -m nestra", command)
+
+
+def _module_command(python_executable: str | Path | None) -> str:
+    executable = str(Path(python_executable or sys.executable).resolve())
+    quoted = f'"{executable}"' if os.name == "nt" else shlex.quote(executable)
+    return f"{quoted} -m nestra"
 
 
 def _target_status(statuses: list[str]) -> str:

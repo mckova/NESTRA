@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime, timezone
+
+import pytest
 
 from nestra import (
     ScopedMemory,
@@ -85,3 +88,66 @@ def test_snapshot_restores_and_hydrates_scoped_memory():
         == 3
     )
     assert memory.query(scope="project", namespace="project:other", role="builder") == []
+
+
+def test_duplicate_document_ids_and_malformed_snapshots_are_rejected():
+    with pytest.raises(ValueError, match="unique ids"):
+        compile_project_memory(
+            {
+                "projectId": "duplicate",
+                "documents": [
+                    {"id": "same", "title": "A", "text": "Alpha.", "trust": "trusted"},
+                    {"id": "same", "title": "B", "text": "Beta.", "trust": "trusted"},
+                ],
+            }
+        )
+    snapshot = compile_project_memory({"projectId": "valid", "documents": DOCUMENTS[:1]}).export()
+    del snapshot["facts"][0]["trust"]
+    with pytest.raises(ValueError, match="missing required fields"):
+        restore_project_memory(snapshot)
+
+
+def test_snapshot_integrity_rejects_tampered_graph_and_hidden_fields():
+    original = compile_project_memory({"projectId": "valid", "documents": DOCUMENTS[:2]}).export()
+
+    snapshot = deepcopy(original)
+    snapshot["unexpected"] = "hidden"
+    with pytest.raises(ValueError, match="unsupported fields"):
+        restore_project_memory(snapshot)
+
+    snapshot = deepcopy(original)
+    snapshot["facts"][0]["entityIds"] = []
+    with pytest.raises(ValueError, match="entityIds are inconsistent"):
+        restore_project_memory(snapshot)
+
+    snapshot = deepcopy(original)
+    snapshot["relations"] = []
+    snapshot["stats"]["relations"] = 0
+    with pytest.raises(ValueError, match="relation set"):
+        restore_project_memory(snapshot)
+
+
+@pytest.mark.parametrize(
+    "document",
+    [
+        {"title": 123, "text": "Alpha."},
+        {"title": "A", "text": 123},
+        {"title": "A", "text": "", "sentences": ["Alpha."]},
+        {"title": "A", "text": "Alpha.", "trust": "maybe"},
+        {"title": "A", "text": "Alpha.", "sensitivity": "private"},
+        {"title": "A", "text": "Alpha.", "sourceQuality": 2},
+        {"id": "", "title": "A", "text": "Alpha."},
+    ],
+)
+def test_document_contract_rejects_invalid_explicit_values(document):
+    with pytest.raises(ValueError):
+        compile_project_memory({"projectId": "invalid", "documents": [document]})
+
+
+def test_project_id_and_default_trust_are_strict():
+    with pytest.raises(ValueError, match="projectId"):
+        compile_project_memory({"projectId": 123, "documents": DOCUMENTS[:1]})
+    with pytest.raises(ValueError, match="default_trust"):
+        compile_project_memory(
+            {"projectId": "valid", "documents": DOCUMENTS[:1]}, default_trust="maybe"
+        )

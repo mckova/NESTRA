@@ -19,7 +19,9 @@ except ModuleNotFoundError:  # Python 3.10 development environments
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from nestra.config import create_nestra_config  # noqa: E402
 from nestra.ml.logistic import LearnedRouterModel  # noqa: E402
+from nestra.security import PROJECT_ID  # noqa: E402
 from nestra.version import VERSION  # noqa: E402
 
 
@@ -50,6 +52,7 @@ def main() -> int:
         "examples/sdk/learned_router.py",
         "openapi/nestra.openapi.yaml",
         ".github/workflows/ci.yml",
+        ".github/workflows/codeql.yml",
     ]
     for relative in required:
         if not (ROOT / relative).is_file():
@@ -72,6 +75,10 @@ def main() -> int:
             parsed_schemas[path.name] = schema
         except Exception as error:
             errors.append(f"invalid JSON {path.name}: {error}")
+    try:
+        validate(create_nestra_config(), parsed_schemas["nestra-config.schema.json"])
+    except Exception as error:
+        errors.append(f"default config does not satisfy its public schema: {error}")
     try:
         repository_model = json.loads(
             (ROOT / "models/router/micro-safety-demo.json").read_text(encoding="utf-8")
@@ -98,13 +105,50 @@ def main() -> int:
         parsed_openapi = yaml.safe_load(openapi)
         if parsed_openapi.get("openapi") != "3.1.0":
             errors.append("OpenAPI document must use version 3.1.0")
+        documented_pattern = parsed_openapi["components"]["schemas"]["ProjectId"]["pattern"]
+        if documented_pattern != PROJECT_ID.pattern:
+            errors.append("OpenAPI ProjectId pattern does not match runtime validation")
+        for route, method in (
+            ("/v1/projects", "get"),
+            ("/v1/projects/{projectId}", "get"),
+            ("/v1/projects/{projectId}/ingest", "post"),
+            ("/v1/route", "post"),
+            ("/v1/query", "post"),
+            ("/v1/metrics", "get"),
+        ):
+            responses = parsed_openapi["paths"][route][method]["responses"]
+            if "401" not in responses or "429" not in responses:
+                errors.append(f"OpenAPI {method.upper()} {route} lacks auth/rate responses")
+        for route, method, status in (
+            ("/v1/projects/{projectId}", "get", "200"),
+            ("/v1/projects/{projectId}/ingest", "post", "201"),
+            ("/v1/route", "post", "200"),
+            ("/v1/query", "post", "200"),
+            ("/v1/metrics", "get", "200"),
+        ):
+            schema = parsed_openapi["paths"][route][method]["responses"][status]["content"][
+                "application/json"
+            ]["schema"]
+            if "$ref" not in schema:
+                errors.append(
+                    f"OpenAPI {method.upper()} {route} success response lacks a concrete schema"
+                )
         for relative in (
             "compose.yaml",
             ".github/workflows/ci.yml",
+            ".github/workflows/codeql.yml",
             ".github/workflows/release.yml",
             ".github/dependabot.yml",
         ):
             yaml.safe_load((ROOT / relative).read_text(encoding="utf-8"))
+        for workflow in (ROOT / ".github" / "workflows").glob("*.yml"):
+            text = workflow.read_text(encoding="utf-8")
+            for action in re.findall(r"\buses:\s*([^\s#]+)", text):
+                reference = action.rsplit("@", 1)[-1]
+                if not re.fullmatch(r"[a-f0-9]{40}", reference):
+                    errors.append(
+                        f"GitHub Action is not pinned to a commit SHA: {workflow.name} {action}"
+                    )
     except Exception as error:
         errors.append(f"invalid YAML contract: {error}")
     if not compileall.compile_dir(ROOT / "src/nestra", quiet=1, force=True):
@@ -130,6 +174,9 @@ def main() -> int:
         )
     if (ROOT / "package.json").exists() or (ROOT / "package-lock.json").exists():
         errors.append("Node package metadata remains after the Python migration")
+    docker_from = (ROOT / "Dockerfile").read_text(encoding="utf-8").splitlines()[0]
+    if not re.fullmatch(r"FROM\s+python:[^\s@]+@sha256:[a-f0-9]{64}", docker_from):
+        errors.append("Docker base image must be pinned to a sha256 digest")
     legacy_brand = re.compile(
         "|".join(
             (

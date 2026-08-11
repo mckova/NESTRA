@@ -21,7 +21,7 @@ The client, gateway process, project store, external retriever, and model provid
 
 ## Mitigations
 
-Input normalization, strict IDs, safe retrieval filters, injection flags, fail-closed guards, explicit call/token limits, timeouts, bounded retry, rate/concurrency limits, body caps, bearer authentication, constant-time token comparison, atomic storage, provenance, TTL/decay, recursive audit redaction, and no raw content in metrics.
+Input normalization, strict IDs, topical retrieval checks, safe retrieval filters, obfuscation-aware injection flags, citation grounding, pre-call token limits, timeouts, bounded retry, gateway-wide rate limits, bounded request workers, body-framing caps, bearer authentication, constant-time token comparison, deep snapshot validation, atomic storage, provenance, TTL/decay, recursive audit redaction, and no raw content in metrics.
 
 Learned artifacts are data-only, schema-validated, opt-in, and unable to override Blocked/Retrieval routes or deterministic evidence eligibility. Router model ID, route source, and veto reason are observable. Production deployments should verify artifact provenance or signatures and alert on drift.
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import threading
 import time
 import uuid
@@ -14,6 +15,7 @@ from .control import HookBus
 from .evidence import (
     compile_atomic_evidence,
     evaluate_accuracy_lock,
+    evaluate_structured_answer_support,
     ground_answer_span,
     micro_prompt,
 )
@@ -21,7 +23,7 @@ from .metrics import MetricsCollector
 from .ml.features import extract_router_features
 from .ml.hybrid import apply_learned_routing
 from .ml.logistic import LearnedRouterModel
-from .project_memory import compile_project_memory
+from .project_memory import compile_project_memory, estimate_tokens
 from .providers import assert_model_provider, normalize_usage
 from .retrievers import normalize_retrieved_documents
 from .routing import route_nestra_query
@@ -121,13 +123,20 @@ class NestraRuntime:
         }
 
     def query(
-        self, *, project_id: str, question: str, mode: str = "auto", actor_id: str = "anonymous"
+        self,
+        *,
+        project_id: str,
+        question: str,
+        mode: str = "auto",
+        actor_id: str = "anonymous",
+        enforce_rate_limit: bool = True,
     ) -> dict[str, Any]:
         request_id = str(uuid.uuid4())
         started = time.perf_counter()
-        rate = self.rate_limiter.consume(actor_id)
-        if not rate["allowed"]:
-            raise NestraRateLimitError(int(rate["retryAfterMs"]))
+        if enforce_rate_limit:
+            rate = self.rate_limiter.consume(actor_id)
+            if not rate["allowed"]:
+                raise NestraRateLimitError(int(rate["retryAfterMs"]))
         if not self._capacity.acquire(blocking=False):
             error = RuntimeError("NESTRA concurrency limit reached.")
             error.code = "concurrency_limited"
@@ -355,6 +364,11 @@ class NestraRuntime:
 
     def _prepare(self, *, project_id: str, question: str, mode: str) -> dict[str, Any]:
         project_id = validate_project_id(project_id)
+        if not isinstance(question, str):
+            raise ValueError("question must be a non-empty string.")
+        if not isinstance(mode, str) or mode.lower() not in {"auto", "retrieval"}:
+            raise ValueError("mode must be auto or retrieval.")
+        mode = mode.lower()
         question = sanitize_user_text(
             question, field="question", max_chars=self.config["security"]["maxQuestionChars"]
         )
@@ -432,6 +446,17 @@ class NestraRuntime:
             target_total_tokens=tier["targetTotalTokens"],
             max_output_tokens=tier["maxOutputTokens"],
         )
+        if compilation["estimatedTotalTokens"] > tier["targetTotalTokens"]:
+            return {
+                "accepted": False,
+                "answer": None,
+                "evidence": self._public_evidence({"atoms": compilation["atoms"]}),
+                "guard": {
+                    "accepted": False,
+                    "reasons": ["micro_token_budget_exceeded"],
+                    "estimatedTotalTokens": compilation["estimatedTotalTokens"],
+                },
+            }
         flags = list(
             dict.fromkeys(
                 flag
@@ -456,10 +481,7 @@ class NestraRuntime:
         )
         answer = ground_answer_span(response.get("text"), compilation["evidenceText"])
         guard = evaluate_accuracy_lock(prepared["question"], answer, compilation)
-        sources = {row["title"]: row.get("sourceUri") for row in documents}
-        evidence = [
-            {**atom, "sourceUri": sources.get(atom["title"])} for atom in compilation["atoms"]
-        ]
+        evidence = self._public_evidence({"atoms": compilation["atoms"]})
         return {
             "accepted": guard["accepted"],
             "answer": answer,
@@ -472,19 +494,30 @@ class NestraRuntime:
     ) -> dict[str, Any]:
         tier = self.config["tiers"][tier_name]
         evidence_text = "\n".join(f"{atom['id']}:{atom['promptText']}" for atom in recall["atoms"])
-        response = self._call_provider(
-            tier_name,
-            {
-                "name": f"nestra_{tier_name}",
-                "instructions": "Answer only from the supplied evidence. Cite evidence_ids used. If evidence is insufficient, answer unknown with confidence 0.",
-                "input": f"Q:{question}\nE:\n{evidence_text}",
-                "maxOutputTokens": tier["maxOutputTokens"],
-                "model": tier["model"],
-                "reasoningEffort": tier["reasoningEffort"],
-                "outputSchema": ANSWER_SCHEMA,
-            },
-            calls,
-        )
+        request = {
+            "name": f"nestra_{tier_name}",
+            "instructions": "Answer only from the supplied evidence. Cite evidence_ids used. If evidence is insufficient, answer unknown with confidence 0.",
+            "input": f"Q:{question}\nE:\n{evidence_text}",
+            "maxOutputTokens": tier["maxOutputTokens"],
+            "model": tier["model"],
+            "reasoningEffort": tier["reasoningEffort"],
+            "outputSchema": ANSWER_SCHEMA,
+        }
+        projected_tokens = self._usage(calls)["totalTokens"] + self._estimate_call_tokens(request)
+        if tier.get("maxTotalTokens") and projected_tokens > tier["maxTotalTokens"]:
+            return {
+                "accepted": False,
+                "answer": None,
+                "guard": {
+                    "accepted": False,
+                    "reasons": ["cascade_token_budget_exceeded"],
+                    "confidence": 0,
+                    "evidenceIds": [],
+                    "estimatedTotalTokens": projected_tokens,
+                },
+                "evidence": self._public_evidence(recall),
+            }
+        response = self._call_provider(tier_name, request, calls)
         parsed = response.get("parsed")
         if not isinstance(parsed, dict):
             try:
@@ -500,9 +533,11 @@ class NestraRuntime:
             guard["accepted"] = False
         return {
             "accepted": guard["accepted"],
-            "answer": str(parsed.get("answer", "")).strip() or None,
+            "answer": parsed["answer"].strip()
+            if isinstance(parsed.get("answer"), str) and parsed["answer"].strip()
+            else None,
             "guard": guard,
-            "evidence": self._public_evidence(recall, parsed.get("evidence_ids")),
+            "evidence": self._public_evidence(recall, guard["evidenceIds"]),
         }
 
     def _call_provider(
@@ -533,22 +568,29 @@ class NestraRuntime:
         self, parsed: dict[str, Any], recall: dict[str, Any], tier: str
     ) -> dict[str, Any]:
         reasons = []
-        answer = str(parsed.get("answer", "")).strip()
+        raw_answer = parsed.get("answer")
+        answer = raw_answer.strip() if isinstance(raw_answer, str) else ""
         confidence = parsed.get("confidence")
-        ids = list(
-            dict.fromkeys(
-                parsed.get("evidence_ids", [])
-                if isinstance(parsed.get("evidence_ids"), list)
-                else []
-            )
+        raw_ids = parsed.get("evidence_ids", [])
+        valid_id_list = isinstance(raw_ids, list) and all(
+            isinstance(item, str) and item for item in raw_ids
         )
+        ids = list(dict.fromkeys(raw_ids)) if valid_id_list else []
         atoms = {row["id"]: row for row in recall["atoms"]}
+        if not isinstance(raw_answer, str):
+            reasons.append("invalid_answer_type")
         if not answer or answer.lower() == "unknown":
             reasons.append("empty_or_unknown")
-        if not isinstance(confidence, (int, float)) or confidence < (
-            0.55 if tier == "full" else 0.65
-        ):
+        valid_confidence = (
+            not isinstance(confidence, bool)
+            and isinstance(confidence, (int, float))
+            and math.isfinite(float(confidence))
+            and 0 <= confidence <= 1
+        )
+        if not valid_confidence or confidence < (0.55 if tier == "full" else 0.65):
             reasons.append("low_confidence")
+        if not valid_id_list:
+            reasons.append("invalid_citation_type")
         if not ids:
             reasons.append("missing_citations")
         if any(item not in atoms for item in ids):
@@ -558,12 +600,21 @@ class NestraRuntime:
             reasons.append("single_document_support")
         if len(answer) > 4_000:
             reasons.append("answer_too_long")
+        cited_atoms = [atoms[item] for item in ids if item in atoms]
+        support = evaluate_structured_answer_support(answer, cited_atoms)
+        reasons.extend(support["reasons"])
         return {
             "accepted": not reasons,
-            "reasons": reasons,
-            "confidence": float(confidence) if isinstance(confidence, (int, float)) else 0,
+            "reasons": list(dict.fromkeys(reasons)),
+            "confidence": float(confidence) if valid_confidence else 0,
             "evidenceIds": ids,
+            "answerSupport": support,
         }
+
+    @staticmethod
+    def _estimate_call_tokens(request: dict[str, Any]) -> int:
+        prompt = f"{request.get('instructions', '')}\n{request.get('input', '')}"
+        return estimate_tokens(prompt) + max(0, int(request.get("maxOutputTokens", 0) or 0))
 
     def _result(
         self,
@@ -671,7 +722,7 @@ class NestraRuntime:
 
     @classmethod
     def _retrieval_evidence(cls, recall: dict[str, Any]) -> list[dict[str, Any]]:
-        positive = [atom for atom in recall.get("atoms", []) if atom.get("retrievalScore", 0) > 0]
+        positive = [atom for atom in recall.get("atoms", []) if atom.get("queryCoverage", 0) > 0]
         return cls._public_evidence({"atoms": positive or recall.get("atoms", [])[:2]})
 
     @staticmethod

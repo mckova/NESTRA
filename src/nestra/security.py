@@ -15,7 +15,7 @@ INJECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "instruction_override",
         re.compile(
-            r"\b(?:ignore|disregard|forget)\b.{0,40}\b(?:previous|prior|system|developer)\b.{0,30}\b(?:instructions?|messages?|prompt)\b",
+            r"\b(?:ignore|disregard|forget|override|bypass)\b.{0,40}\b(?:previous|prior|above|system|developer|all)\b.{0,40}\b(?:instructions?|messages?|prompt)\b|\b(?:ignore|disregard|forget)\b.{0,30}\b(?:instructions?|messages?|prompt)\b.{0,20}\b(?:above|before)\b|\bnew\b.{0,20}\b(?:highest|top)\b.{0,20}\bpriority\b.{0,20}\binstruction\b",
             re.I | re.S,
         ),
     ),
@@ -26,11 +26,14 @@ INJECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
             re.I | re.S,
         ),
     ),
-    ("role_spoofing", re.compile(r"(?:^|\n)\s*(?:system|developer|assistant)\s*:", re.I | re.M)),
+    (
+        "role_spoofing",
+        re.compile(r"(?:^|\n)\s*(?:system|developer|assistant|מערכת|מפתח|עוזר)\s*:", re.I | re.M),
+    ),
     (
         "tool_coercion",
         re.compile(
-            r"\b(?:execute|run|invoke|call)\b.{0,30}\b(?:shell|terminal|command|tool)\b",
+            r"\b(?:execute|run|invoke|call)\b.{0,30}\b(?:shell|powershell|pwsh|bash|terminal|command|tool)\b",
             re.I | re.S,
         ),
     ),
@@ -41,11 +44,53 @@ INJECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
             re.I | re.S,
         ),
     ),
+    (
+        "instruction_override_he",
+        re.compile(
+            r"(?:התעלם|התעלמי|התעלמו|עקוף|עקפי|בטל|בטלי).{0,40}(?:הוראות|הנחיות|פרומפט).{0,30}(?:קודמות|המערכת|מערכת|המפתח|מפתח|למעלה)",
+            re.S,
+        ),
+    ),
+    (
+        "prompt_exfiltration_he",
+        re.compile(
+            r"(?:חשוף|חשפי|הצג|הציגי|הדפס|הדפיסי).{0,40}(?:פרומפט|הנחיות|הוראות|הודעת).{0,25}(?:מערכת|מפתח|נסתר|סודי)",
+            re.S,
+        ),
+    ),
+)
+
+OBFUSCATION_KEYWORDS = (
+    "ignore",
+    "disregard",
+    "forget",
+    "override",
+    "bypass",
+    "previous",
+    "instructions",
+    "system",
+    "developer",
+    "prompt",
+    "reveal",
+    "execute",
+    "powershell",
+    "terminal",
+    "command",
+    "tool",
+    "התעלם",
+    "התעלמי",
+    "הוראות",
+    "הנחיות",
+    "מערכת",
+    "מפתח",
+    "פרומפט",
+    "חשוף",
+    "חשפי",
 )
 
 
 def validate_project_id(value: object) -> str:
-    project_id = str(value or "").strip()
+    project_id = value.strip() if isinstance(value, str) else ""
     if not PROJECT_ID.fullmatch(project_id) or project_id in {".", ".."}:
         raise ValueError(
             "projectId must be 1-64 URL-safe characters (letters, numbers, dot, underscore, or hyphen)."
@@ -64,9 +109,21 @@ def sanitize_user_text(value: object, *, field: str = "input", max_chars: int = 
 
 
 def detect_prompt_injection(value: object) -> dict[str, object]:
-    text = str(value or "")
+    text = _normalize_security_text(value)
     flags = [name for name, pattern in INJECTION_PATTERNS if pattern.search(text)]
     return {"detected": bool(flags), "flags": flags}
+
+
+def _normalize_security_text(value: object) -> str:
+    text = unicodedata.normalize("NFKC", str(value or ""))
+    text = "".join(char for char in text if unicodedata.category(char) != "Cf")
+    text = text.casefold().translate(
+        str.maketrans({"0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a"})
+    )
+    for keyword in OBFUSCATION_KEYWORDS:
+        separated = r"[\W_]*".join(re.escape(char) for char in keyword)
+        text = re.sub(rf"(?<!\w){separated}(?!\w)", keyword, text, flags=re.I)
+    return text
 
 
 def stable_hash(value: object, length: int = 24) -> str:

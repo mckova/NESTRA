@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from .project_memory import evaluate_pre_call_gate
+from .project_memory import STOPWORDS, evaluate_pre_call_gate, tokenize_project_text
 from .security import detect_prompt_injection
 
 NESTRA_ROUTES = ("blocked", "retrieval", "micro", "meso", "full")
@@ -20,8 +20,10 @@ def route_nestra_query(
     mode: str = "auto",
     options: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    if not str(question).strip():
+    if not isinstance(question, str) or not question.strip():
         raise ValueError("question must be a non-empty string.")
+    if not isinstance(mode, str) or mode.lower() not in {"auto", "retrieval"}:
+        raise ValueError("mode must be auto or retrieval.")
     config = options or {}
     raw = raw_recall or safe_recall
     expanded = expanded_recall or safe_recall
@@ -54,11 +56,34 @@ def route_nestra_query(
         return _decision(
             "blocked", ["relevant_evidence_not_authorized"], False, {"microGate": None}
         )
-    requested = str(mode or "auto").lower()
-    if (
-        requested == "retrieval" or (requested == "auto" and is_retrieval_intent(question))
-    ) and safe_recall.get("atoms"):
-        return _decision("retrieval", ["generation_not_required"], True, {"microGate": None})
+    requested = mode.lower()
+    retrieval_requested = requested == "retrieval" or (
+        requested == "auto" and is_retrieval_intent(question)
+    )
+    if retrieval_requested:
+        topic_terms = _retrieval_topic_terms(question)
+        evidence_terms = {
+            token
+            for atom in safe_recall.get("atoms", [])
+            for token in tokenize_project_text(f"{atom.get('title', '')} {atom.get('text', '')}")
+        }
+        topic_coverage = len(topic_terms & evidence_terms) / max(1, len(topic_terms))
+        relevant = not topic_terms or topic_coverage >= float(
+            config.get("retrievalMinimumTopicCoverage", 0.5)
+        )
+        if safe_recall.get("atoms") and relevant:
+            return _decision(
+                "retrieval",
+                ["generation_not_required"],
+                True,
+                {"microGate": None, "retrievalTopicCoverage": round(topic_coverage, 6)},
+            )
+        return _decision(
+            "blocked",
+            ["insufficient_relevant_evidence"],
+            False,
+            {"microGate": None, "retrievalTopicCoverage": round(topic_coverage, 6)},
+        )
     micro_gate = evaluate_pre_call_gate(
         question,
         safe_recall,
@@ -115,6 +140,44 @@ def is_retrieval_intent(question: str) -> bool:
             question,
         )
     )
+
+
+def _retrieval_topic_terms(question: str) -> set[str]:
+    cues = {
+        "document",
+        "documents",
+        "evidence",
+        "fact",
+        "facts",
+        "find",
+        "list",
+        "passage",
+        "passages",
+        "retrieve",
+        "return",
+        "show",
+        "source",
+        "sources",
+        "הציג",
+        "הציגי",
+        "מסמכים",
+        "מצא",
+        "מצאי",
+        "מקור",
+        "מקורות",
+        "עובדות",
+        "קטעים",
+        "ראיות",
+        "ראה",
+        "ראי",
+        "רשום",
+        "רשמי",
+    }
+    return {
+        token
+        for token in tokenize_project_text(question)
+        if token not in STOPWORDS and token not in cues and token not in {"על", "את", "של"}
+    }
 
 
 def _decision(

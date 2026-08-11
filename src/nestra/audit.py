@@ -6,12 +6,18 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from threading import Lock
 from typing import Any, Callable
 
 SECRET_KEY = re.compile(
     r"authorization|api[-_]?key|secret|password|access[-_]?token|refresh[-_]?token|cookie", re.I
 )
-CONTENT_KEY = re.compile(r"^(prompt|input|content|memory|reusableContext|messages)$", re.I)
+CONTENT_KEY = re.compile(
+    r"^(prompt|input|output|content|text|question|answer|evidence|memory|reusableContext|messages)$",
+    re.I,
+)
+_LOCKS_GUARD = Lock()
+_PATH_LOCKS: dict[Path, Lock] = {}
 
 
 def redact(value: Any, key: str = "") -> Any:
@@ -36,7 +42,12 @@ def append_audit(
         }
     )
     target = Path(file_path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("a", encoding="utf-8", newline="\n") as handle:
-        handle.write(json.dumps(safe, ensure_ascii=False, separators=(",", ":")) + "\n")
+    resolved = target.resolve()
+    with _LOCKS_GUARD:
+        lock = _PATH_LOCKS.setdefault(resolved, Lock())
+    with lock:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(safe, ensure_ascii=False, separators=(",", ":")) + "\n")
+            handle.flush()
     return safe

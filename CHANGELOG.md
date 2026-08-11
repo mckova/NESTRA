@@ -2,6 +2,28 @@
 
 All notable changes follow Keep a Changelog conventions. The project uses semantic versioning for its Python, CLI, storage, and HTTP contracts.
 
+## [2.1.1] - 2026-08-11
+
+### Fixed
+
+- Retrieval requests now require topical evidence instead of treating the source-quality baseline as relevance; unrelated evidence can no longer be returned as verified.
+- Meso and Full answers now require deterministic lexical and numeric support from the cited evidence, including strict handling of malformed structured fields.
+- Total-token budgets are checked before provider calls, and an explicitly empty CLI environment no longer falls back to process credentials.
+- Negative `Content-Length`, transfer encoding, non-object JSON, duplicate document IDs, malformed or internally inconsistent snapshots, incomplete memory records, and repeated archive counters now fail closed.
+- Public JSON Schema and OpenAPI validation now match runtime project-ID, request-type, response, and configuration rules.
+- Micro requests that cannot fit their estimated token target are rejected before a provider call, and public Micro evidence no longer exposes internal prompt or untruncated-text fields.
+
+### Security
+
+- The gateway rate-limits every `/v1/*` request, including failed authentication, bounds request threads, applies socket timeouts, and uses thread-safe metrics, hooks, and audit writes.
+- Prompt-injection normalization now covers format-character, common leetspeak, and separator-based obfuscation, priority overrides, and common Hebrew instruction overrides.
+- GitHub Actions and the Docker base image are pinned to immutable digests; CodeQL and Docker Dependabot coverage were added.
+
+### Changed
+
+- Native AI CLI adapters embed a `python -m nestra` fallback tied to the installed interpreter for hosts that block generated executable shims.
+- The offline safety suite now includes an out-of-domain retrieval regression and passes 8/8 deterministic cases.
+
 ## [2.1.0] - 2026-08-06
 
 ### Added
