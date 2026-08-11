@@ -8,6 +8,6 @@ NESTRA reports three costs separately.
 
 The current compiler is deterministic and local, so provider ingestion tokens are zero. Future neural extraction or embedding stages must report their provider or compute cost rather than hiding it.
 
-Every query result reports `inputTokens`, `outputTokens`, `reasoningTokens`, `cachedInputTokens`, and `totalTokens` for all attempted routes. Retrieval-only and Blocked results must report zero model calls and zero provider tokens. A Micro result that exceeds its configured 50–100 target is returned with a `micro_token_target_exceeded` alert; the measurement is never clipped to the target.
+Every query result reports `inputTokens`, `outputTokens`, `reasoningTokens`, `cachedInputTokens`, and `totalTokens` for all attempted routes. Retrieval-only and Blocked results must report zero model calls and zero provider tokens. NESTRA skips a Micro provider call when the pre-call estimate cannot fit its configured 50–100 target. If observed provider usage still exceeds the estimate, the result carries a `micro_token_target_exceeded` alert; the measurement is never clipped to the target.
 
 HotpotQA gives each question a different corpus, so it cannot demonstrate amortized project-memory reuse. It is useful for retrieval falsification only. The next evaluation needs many questions over the same compiled project and must report ingestion latency, storage size, recall latency, query tokens, escalation rate, and amortized tokens per question.

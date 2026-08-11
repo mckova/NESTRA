@@ -22,7 +22,7 @@ python benchmarks/router_ml/run.py
 python -m benchmarks.nestra_oracle.benchmark --limit 12
 ```
 
-The Project Memory suite requires no network or model. The live oracle requires an API key and compares Direct GPT-5.6, BM25 RAG + GPT-5.6, Fixed NESTRA, Adaptive NESTRA, pre-gated Micro, Micro-100, and an accuracy-locked cascade on a seeded HotpotQA selection.
+The Project Memory suite requires no network or model. Its eight deterministic cases include poisoned, sensitive, incomplete, oversized, unlinked, Hebrew, and topically irrelevant retrieval evidence. The live oracle requires an API key and compares Direct GPT-5.6, BM25 RAG + GPT-5.6, Fixed NESTRA, Adaptive NESTRA, pre-gated Micro, Micro-100, and an accuracy-locked cascade on a seeded HotpotQA selection.
 
 The learned-router suite trains locally on 18 historical examples, calibrates on six separate examples, and evaluates on six disjoint examples. Classifier calibration and policy decisions are reported separately: Micro precision and unsafe-Micro rate measure safety; Micro route rate estimates potential savings; Full over-routing measures conservatism.
 

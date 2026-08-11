@@ -8,6 +8,8 @@ NESTRA_API_TOKEN="long-random-value" OPENAI_API_KEY="..." nestra serve
 
 The default address is `127.0.0.1:8787`. `/health` is public; every `/v1/*` endpoint requires `Authorization: Bearer …`. The full contract is in `openapi/nestra.openapi.yaml`.
 
+Every `/v1/*` request, including a failed authentication attempt, consumes the per-client rate budget. The reference server bounds active request threads, sets a socket timeout, rejects transfer encoding, and validates a non-negative `Content-Length` before reading JSON. Query execution uses the same limiter without double-counting the request.
+
 ## Endpoint summary
 
 - `POST /v1/projects/{projectId}/ingest` compiles and persists documents.

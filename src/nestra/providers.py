@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import time
 import urllib.error
 import urllib.request
 from typing import Any, Callable
+from urllib.parse import urlparse
 
 
 class ModelProviderError(RuntimeError):
@@ -27,24 +29,32 @@ def assert_model_provider(provider: object) -> None:
 
 
 def normalize_usage(value: dict[str, Any] | None) -> dict[str, int]:
-    row = value or {}
+    row = value if isinstance(value, dict) else {}
+    output_details = (
+        row.get("output_tokens_details")
+        if isinstance(row.get("output_tokens_details"), dict)
+        else {}
+    )
+    input_details = (
+        row.get("input_tokens_details") if isinstance(row.get("input_tokens_details"), dict) else {}
+    )
     input_tokens = _integer(row.get("inputTokens", row.get("input_tokens", 0)))
     output_tokens = _integer(row.get("outputTokens", row.get("output_tokens", 0)))
     reasoning = _integer(
         row.get(
             "reasoningTokens",
-            row.get(
-                "reasoning_tokens", row.get("output_tokens_details", {}).get("reasoning_tokens", 0)
-            ),
+            row.get("reasoning_tokens", output_details.get("reasoning_tokens", 0)),
         )
     )
     cached = _integer(
         row.get(
-            "cachedInputTokens",
-            row.get("cached_tokens", row.get("input_tokens_details", {}).get("cached_tokens", 0)),
+            "cachedInputTokens", row.get("cached_tokens", input_details.get("cached_tokens", 0))
         )
     )
-    total = _integer(row.get("totalTokens", row.get("total_tokens", input_tokens + output_tokens)))
+    total = max(
+        input_tokens + output_tokens,
+        _integer(row.get("totalTokens", row.get("total_tokens", input_tokens + output_tokens))),
+    )
     return {
         "inputTokens": input_tokens,
         "outputTokens": output_tokens,
@@ -65,14 +75,37 @@ class OpenAIResponsesProvider:
         timeout_seconds: float = 30,
         max_retries: int = 1,
         opener: Callable[..., Any] | None = None,
+        use_environment: bool = True,
     ) -> None:
-        self.api_key = str(
-            api_key or os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENAI_KEY") or ""
-        ).strip()
+        resolved_key = api_key
+        if resolved_key is None and use_environment:
+            resolved_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENAI_KEY")
+        self.api_key = str(resolved_key or "").strip()
         if not self.api_key:
             raise ModelProviderError("OPENAI_API_KEY is required.", code="provider_key_missing")
-        self.endpoint = endpoint
-        self.timeout_seconds = timeout_seconds
+        parsed_endpoint = urlparse(str(endpoint))
+        secure_endpoint = parsed_endpoint.scheme == "https" and bool(parsed_endpoint.hostname)
+        loopback_endpoint = parsed_endpoint.scheme == "http" and parsed_endpoint.hostname in {
+            "127.0.0.1",
+            "::1",
+            "localhost",
+        }
+        if not secure_endpoint and not loopback_endpoint:
+            raise ModelProviderError(
+                "Provider endpoint must use HTTPS unless it is loopback.",
+                code="provider_endpoint_invalid",
+            )
+        if (
+            isinstance(timeout_seconds, bool)
+            or not isinstance(timeout_seconds, (int, float))
+            or not math.isfinite(float(timeout_seconds))
+            or timeout_seconds <= 0
+        ):
+            raise ModelProviderError(
+                "Provider timeout must be positive.", code="provider_timeout_invalid"
+            )
+        self.endpoint = str(endpoint)
+        self.timeout_seconds = float(timeout_seconds)
         self.max_retries = max(0, int(max_retries))
         self.opener = opener or urllib.request.urlopen
 

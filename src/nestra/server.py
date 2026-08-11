@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import hmac
 import json
+import math
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import unquote, urlparse
 
-from .security import NestraRateLimitError
+from .security import NestraRateLimitError, SlidingWindowRateLimiter
 from .storage import ProjectNotFoundError
 from .version import VERSION
 
@@ -21,6 +23,9 @@ def create_nestra_server(
     token: str | None = None,
     allow_unauthenticated: bool = False,
     max_body_bytes: int = 1_000_000,
+    rate_limiter: SlidingWindowRateLimiter | None = None,
+    max_workers: int | None = None,
+    request_timeout_seconds: float | None = None,
 ) -> ThreadingHTTPServer:
     if runtime is None:
         raise ValueError("create_nestra_server requires a runtime.")
@@ -28,6 +33,39 @@ def create_nestra_server(
         raise ValueError("NESTRA_API_TOKEN is required unless allow_unauthenticated is enabled.")
     if allow_unauthenticated and host not in {"127.0.0.1", "::1", "localhost"}:
         raise ValueError("Unauthenticated mode is restricted to a loopback host.")
+    if (
+        isinstance(max_body_bytes, bool)
+        or not isinstance(max_body_bytes, int)
+        or max_body_bytes < 1
+    ):
+        raise ValueError("max_body_bytes must be a positive integer.")
+    configured_workers = (
+        getattr(runtime, "config", {}).get("security", {}).get("maxConcurrent", 4)
+        if max_workers is None
+        else max_workers
+    )
+    if (
+        isinstance(configured_workers, bool)
+        or not isinstance(configured_workers, int)
+        or configured_workers < 1
+    ):
+        raise ValueError("max_workers must be a positive integer.")
+    configured_timeout = (
+        getattr(runtime, "config", {}).get("runtime", {}).get("maxLatencyMs", 30_000) / 1_000
+        if request_timeout_seconds is None
+        else request_timeout_seconds
+    )
+    if (
+        isinstance(configured_timeout, bool)
+        or not isinstance(configured_timeout, (int, float))
+        or not math.isfinite(float(configured_timeout))
+        or configured_timeout <= 0
+    ):
+        raise ValueError("request_timeout_seconds must be positive.")
+    gateway_limiter = rate_limiter or getattr(runtime, "rate_limiter", None)
+    if gateway_limiter is None:
+        limit = getattr(runtime, "config", {}).get("security", {}).get("requestsPerMinute", 60)
+        gateway_limiter = SlidingWindowRateLimiter(limit=limit)
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "NESTRA/2"
@@ -48,6 +86,10 @@ def create_nestra_server(
                     return self._json(
                         200, {"status": "ok", "service": "nestra", "version": VERSION}
                     )
+                if path.startswith("/v1/"):
+                    rate = gateway_limiter.consume(self.client_address[0])
+                    if not rate["allowed"]:
+                        raise NestraRateLimitError(int(rate["retryAfterMs"]))
                 if token and not self._authorized(token):
                     return self._json(
                         401,
@@ -97,6 +139,7 @@ def create_nestra_server(
                             question=body.get("question"),
                             mode=body.get("mode", "auto"),
                             actor_id=self.client_address[0],
+                            enforce_rate_limit=False,
                         ),
                     )
                 return self._json(
@@ -133,17 +176,39 @@ def create_nestra_server(
                 error = ValueError("Content-Type must be application/json.")
                 error.code = "unsupported_media_type"
                 raise error
-            length = int(self.headers.get("Content-Length", "0") or 0)
+            if self.headers.get("Transfer-Encoding"):
+                error = ValueError("Transfer-Encoding is not supported.")
+                error.code = "unsupported_transfer_encoding"
+                raise error
+            lengths = self.headers.get_all("Content-Length") or []
+            if len(lengths) > 1:
+                error = ValueError("Multiple Content-Length headers are not allowed.")
+                error.code = "invalid_content_length"
+                raise error
+            raw_length = self.headers.get("Content-Length", "0") or "0"
+            try:
+                length = int(raw_length)
+            except ValueError as cause:
+                error = ValueError("Content-Length must be a non-negative integer.")
+                error.code = "invalid_content_length"
+                raise error from cause
+            if length < 0:
+                error = ValueError("Content-Length must be a non-negative integer.")
+                error.code = "invalid_content_length"
+                raise error
             if length > maximum:
                 error = ValueError("Request body is too large.")
                 error.code = "payload_too_large"
                 raise error
             try:
-                return json.loads(self.rfile.read(length).decode("utf-8") or "{}")
-            except json.JSONDecodeError as cause:
+                parsed = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except (UnicodeDecodeError, json.JSONDecodeError) as cause:
                 error = ValueError("Request body must contain valid JSON.")
                 error.code = "invalid_json"
                 raise error from cause
+            if not isinstance(parsed, dict):
+                raise ValueError("Request body must be a JSON object.")
+            return parsed
 
         def _json(
             self, status: int, body: dict[str, Any], headers: dict[str, str] | None = None
@@ -164,7 +229,47 @@ def create_nestra_server(
             self.end_headers()
             self.wfile.write(payload)
 
-    return ThreadingHTTPServer((host, int(port)), Handler)
+    return _BoundedThreadingHTTPServer(
+        (host, int(port)),
+        Handler,
+        max_workers=int(configured_workers),
+        request_timeout_seconds=float(configured_timeout),
+    )
+
+
+class _BoundedThreadingHTTPServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def __init__(
+        self,
+        server_address: tuple[str, int],
+        handler: type,
+        *,
+        max_workers: int,
+        request_timeout_seconds: float,
+    ):
+        self._worker_slots = threading.BoundedSemaphore(max_workers)
+        self._request_timeout_seconds = request_timeout_seconds
+        super().__init__(server_address, handler)
+
+    def get_request(self) -> tuple[Any, Any]:
+        request, client_address = super().get_request()
+        request.settimeout(self._request_timeout_seconds)
+        return request, client_address
+
+    def process_request(self, request: Any, client_address: Any) -> None:
+        self._worker_slots.acquire()
+        try:
+            super().process_request(request, client_address)
+        except Exception:
+            self._worker_slots.release()
+            raise
+
+    def process_request_thread(self, request: Any, client_address: Any) -> None:
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._worker_slots.release()
 
 
 def _status(error: Exception) -> tuple[int, str]:

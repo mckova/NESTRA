@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+
+import pytest
+from jsonschema import Draft202012Validator
 
 from nestra import FileProjectStore, NestraRuntime
 
@@ -40,6 +44,12 @@ def _runtime(tmp_path: Path, provider=None, documents=None):
     return runtime
 
 
+def _assert_result_schema(result):
+    root = Path(__file__).resolve().parents[1]
+    schema = json.loads((root / "schemas" / "query-result.schema.json").read_text())
+    assert list(Draft202012Validator(schema).iter_errors(result)) == []
+
+
 def test_retrieval_only_returns_evidence_with_zero_model_tokens(tmp_path: Path):
     runtime = _runtime(tmp_path)
     result = runtime.query(
@@ -52,6 +62,20 @@ def test_retrieval_only_returns_evidence_with_zero_model_tokens(tmp_path: Path):
     assert result["telemetry"]["usage"]["totalTokens"] == 0
     assert all(row["retrievalScore"] > 0 for row in result["evidence"])
     assert runtime.telemetry()["metrics"]["routerSources"]["deterministic"] == 1
+    _assert_result_schema(result)
+
+
+def test_retrieval_does_not_verify_unrelated_evidence(tmp_path: Path):
+    result = _runtime(tmp_path).query(
+        project_id="casting",
+        question="Show the evidence sources for quantum chromodynamics",
+        mode="auto",
+    )
+    assert result["route"] == "blocked"
+    assert result["status"] == "blocked"
+    assert not result["verified"]
+    assert result["evidence"] == []
+    assert "insufficient_relevant_evidence" in result["reasons"]
 
 
 def test_micro_keeps_grounded_answer(tmp_path: Path):
@@ -63,6 +87,8 @@ def test_micro_keeps_grounded_answer(tmp_path: Path):
     )
     assert result["route"] == "micro" and result["answer"] == "Elizabeth" and result["verified"]
     assert result["telemetry"]["usage"]["totalTokens"] == 66
+    assert all("originalText" not in row and "promptText" not in row for row in result["evidence"])
+    _assert_result_schema(result)
 
 
 def test_rejected_micro_escalates_to_meso(tmp_path: Path):
@@ -128,6 +154,137 @@ def test_single_document_uses_full(tmp_path: Path):
         project_id="casting", question="When did Apollo 11 land on the Moon?"
     )
     assert result["route"] == "full" and result["verified"]
+    _assert_result_schema(result)
+
+
+def test_structured_answer_must_be_supported_by_its_citations(tmp_path: Path):
+    provider = FakeProvider(
+        [
+            {
+                "parsed": {
+                    "answer": "Apollo 11 landed on Mars in 1900",
+                    "confidence": 0.99,
+                    "evidence_ids": ["e1"],
+                },
+                "usage": {"totalTokens": 50},
+            }
+        ]
+    )
+    documents = [
+        {
+            "title": "Apollo 11",
+            "text": "Apollo 11 landed on the Moon in July 1969.",
+            "trust": "trusted",
+        }
+    ]
+    result = _runtime(tmp_path, provider, documents).query(
+        project_id="casting", question="When and where did Apollo 11 land?"
+    )
+    assert result["route"] == "full"
+    assert result["status"] == "needs_review"
+    assert not result["verified"] and result["answer"] is None
+    assert "answer_not_grounded" in result["guard"]["reasons"]
+    assert "unsupported_numeric_claim" in result["guard"]["reasons"]
+
+
+def test_malformed_structured_fields_fail_closed_without_crashing(tmp_path: Path):
+    provider = FakeProvider(
+        [
+            {
+                "parsed": {"answer": ["Moon"], "confidence": True, "evidence_ids": [{}]},
+                "usage": {"totalTokens": 10},
+            }
+        ]
+    )
+    result = _runtime(
+        tmp_path,
+        provider,
+        [
+            {
+                "title": "Apollo 11",
+                "text": "Apollo 11 landed on the Moon in July 1969.",
+                "trust": "trusted",
+            }
+        ],
+    ).query(project_id="casting", question="When and where did Apollo 11 land?")
+    assert result["status"] == "needs_review" and not result["verified"]
+    assert "invalid_answer_type" in result["guard"]["reasons"]
+    assert "invalid_citation_type" in result["guard"]["reasons"]
+
+
+def test_stopword_only_structured_answer_is_not_grounded(tmp_path: Path):
+    provider = FakeProvider(
+        [
+            {
+                "parsed": {"answer": "the and", "confidence": 0.99, "evidence_ids": ["e1"]},
+                "usage": {"totalTokens": 10},
+            }
+        ]
+    )
+    result = _runtime(
+        tmp_path,
+        provider,
+        [
+            {
+                "title": "Apollo 11",
+                "text": "Apollo 11 landed on the Moon in July 1969.",
+                "trust": "trusted",
+            }
+        ],
+    ).query(project_id="casting", question="When and where did Apollo 11 land?")
+    assert result["status"] == "needs_review" and not result["verified"]
+    assert "answer_not_grounded" in result["guard"]["reasons"]
+
+
+@pytest.mark.parametrize("question,mode", [(123, "auto"), ("question", "invalid"), ("q", 1)])
+def test_query_contract_rejects_invalid_types(tmp_path: Path, question, mode):
+    runtime = _runtime(tmp_path, FakeProvider([]))
+    with pytest.raises(ValueError):
+        runtime.plan(project_id="casting", question=question, mode=mode)
+
+
+def test_total_token_budget_blocks_before_provider_call(tmp_path: Path):
+    provider = FakeProvider([])
+    runtime = NestraRuntime(
+        store=FileProjectStore(tmp_path),
+        provider=provider,
+        config={"tiers": {"full": {"maxOutputTokens": 1, "maxTotalTokens": 1}}},
+    )
+    runtime.ingest(
+        project_id="casting",
+        documents=[
+            {
+                "title": "Apollo 11",
+                "text": "Apollo 11 landed on the Moon in July 1969.",
+                "trust": "trusted",
+            }
+        ],
+    )
+    result = runtime.query(project_id="casting", question="When and where did Apollo 11 land?")
+    assert result["status"] == "needs_review"
+    assert result["telemetry"]["modelCalls"] == 0
+    assert not provider.calls
+    assert "cascade_token_budget_exceeded" in result["guard"]["reasons"]
+
+
+def test_micro_token_budget_is_checked_before_provider_call(tmp_path: Path):
+    provider = FakeProvider([])
+    runtime = NestraRuntime(
+        store=FileProjectStore(tmp_path),
+        provider=provider,
+        config={
+            "tiers": {
+                "meso": {"maxOutputTokens": 1, "maxTotalTokens": 1},
+                "full": {"maxOutputTokens": 1, "maxTotalTokens": 1},
+            }
+        },
+    )
+    runtime.ingest(project_id="casting", documents=DOCUMENTS)
+    question = "What is Sissy Spacek's middle name? " + "Sissy Spacek " * 80
+    result = runtime.query(project_id="casting", question=question)
+    assert not provider.calls
+    assert result["telemetry"]["modelCalls"] == 0
+    assert "micro_guard_escalation" in result["telemetry"]["alerts"]
 
 
 def test_external_retriever_is_untrusted_by_default(tmp_path: Path):

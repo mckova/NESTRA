@@ -63,6 +63,18 @@
     ]
   },
   {
+    "id": "irrelevant-retrieval",
+    "question": "Show the evidence sources for quantum chromodynamics",
+    "expectedRoute": "blocked",
+    "expectedReasons": ["insufficient_relevant_evidence"],
+    "evaluation": "route",
+    "mode": "auto",
+    "documents": [
+      { "title": "Bobbi Bacha", "text": "Bobbi Bacha was portrayed by actress Sissy Spacek.", "trust": "trusted" },
+      { "title": "Sissy Spacek", "text": "Mary Elizabeth Spacek is an American actress known as Sissy Spacek.", "trust": "trusted" }
+    ]
+  },
+  {
     "id": "hebrew-bridge",
     "question": "באיזו מדינה כיהן דוד בן גוריון כראש ממשלה?",
     "expectedRoute": "micro",

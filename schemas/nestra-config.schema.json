@@ -3,29 +3,104 @@
   "$id": "https://nestra.dev/schemas/nestra-config.schema.json",
   "title": "NESTRA configuration",
   "type": "object",
+  "required": ["security", "routing", "tiers", "runtime"],
   "properties": {
-    "security": { "type": "object" },
-    "routing": { "type": "object" },
+    "security": {
+      "type": "object",
+      "required": ["maxQuestionChars", "maxSensitivity", "maxConcurrent", "requestsPerMinute", "requireTrustedEvidence"],
+      "properties": {
+        "maxQuestionChars": { "type": "integer", "minimum": 1 },
+        "maxSensitivity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "maxConcurrent": { "type": "integer", "minimum": 1 },
+        "requestsPerMinute": { "type": "integer", "minimum": 1 },
+        "requireTrustedEvidence": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "routing": {
+      "type": "object",
+      "required": [
+        "requireMultiDocument",
+        "unsafeRelevance",
+        "minimumSafeCoverage",
+        "retrievalMinimumTopicCoverage",
+        "microMinimumCoverage",
+        "microMinimumIntentCoverage",
+        "microMaxEvidenceTokens",
+        "mesoMinimumCoverage",
+        "mesoMinimumIntentCoverage",
+        "mesoMaxEvidenceTokens",
+        "learnedMicroMaxEvidenceTokens"
+      ],
+      "properties": {
+        "requireMultiDocument": { "type": "boolean" },
+        "unsafeRelevance": { "$ref": "#/$defs/unitNumber" },
+        "minimumSafeCoverage": { "$ref": "#/$defs/unitNumber" },
+        "retrievalMinimumTopicCoverage": { "$ref": "#/$defs/unitNumber" },
+        "microMinimumCoverage": { "$ref": "#/$defs/unitNumber" },
+        "microMinimumIntentCoverage": { "$ref": "#/$defs/unitNumber" },
+        "microMaxEvidenceTokens": { "type": "integer", "minimum": 1 },
+        "mesoMinimumCoverage": { "$ref": "#/$defs/unitNumber" },
+        "mesoMinimumIntentCoverage": { "$ref": "#/$defs/unitNumber" },
+        "mesoMaxEvidenceTokens": { "type": "integer", "minimum": 1 },
+        "learnedMicroMaxEvidenceTokens": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
     "tiers": {
       "type": "object",
       "required": ["micro", "meso", "full"],
       "properties": {
-        "micro": { "$ref": "#/$defs/tier" },
-        "meso": { "$ref": "#/$defs/tier" },
-        "full": { "$ref": "#/$defs/tier" }
-      }
+        "micro": { "$ref": "#/$defs/microTier" },
+        "meso": { "$ref": "#/$defs/generatedTier" },
+        "full": { "$ref": "#/$defs/generatedTier" }
+      },
+      "additionalProperties": false
     },
-    "runtime": { "type": "object" }
+    "runtime": {
+      "type": "object",
+      "required": ["maxModelCalls", "maxLatencyMs", "failClosedOnGuardFailure"],
+      "properties": {
+        "maxModelCalls": { "type": "integer", "minimum": 1 },
+        "maxLatencyMs": { "type": "integer", "minimum": 1 },
+        "failClosedOnGuardFailure": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
   },
   "$defs": {
-    "tier": {
+    "unitNumber": { "type": "number", "minimum": 0, "maximum": 1 },
+    "tierBase": {
       "type": "object",
       "required": ["model", "reasoningEffort", "maxOutputTokens"],
       "properties": {
-        "model": { "type": "string" },
+        "model": { "type": "string", "minLength": 1 },
         "reasoningEffort": { "enum": ["none", "low", "medium", "high", "xhigh", "max"] },
         "maxOutputTokens": { "type": "integer", "minimum": 1 }
       }
+    },
+    "microTier": {
+      "type": "object",
+      "required": ["model", "reasoningEffort", "maxOutputTokens", "targetTotalTokens"],
+      "properties": {
+        "model": { "type": "string", "minLength": 1 },
+        "reasoningEffort": { "enum": ["none", "low", "medium", "high", "xhigh", "max"] },
+        "maxOutputTokens": { "type": "integer", "minimum": 1 },
+        "targetTotalTokens": { "type": "integer", "minimum": 50, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "generatedTier": {
+      "type": "object",
+      "required": ["model", "reasoningEffort", "maxOutputTokens", "maxTotalTokens"],
+      "properties": {
+        "model": { "type": "string", "minLength": 1 },
+        "reasoningEffort": { "enum": ["none", "low", "medium", "high", "xhigh", "max"] },
+        "maxOutputTokens": { "type": "integer", "minimum": 1 },
+        "maxTotalTokens": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

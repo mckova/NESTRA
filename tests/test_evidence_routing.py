@@ -26,7 +26,7 @@ def test_atomic_evidence_is_two_document_and_bounded():
     )
     assert len(compilation["atoms"]) == 2
     assert len({row["docIndex"] for row in compilation["atoms"]}) == 2
-    assert compilation["estimatedTotalTokens"] <= 120
+    assert compilation["estimatedTotalTokens"] <= 100
     assert micro_prompt("question", compilation).startswith("Q:question\nE:")
 
 

@@ -53,9 +53,16 @@ pipx install git+https://github.com/mckova/NESTRA.git
 nestra integrations install
 ```
 
+If Windows Application Control blocks pipx's generated `nestra.exe`, run the engine through its interpreter once:
+
+```powershell
+$pipxVenvs = pipx environment --value PIPX_LOCAL_VENVS
+& (Join-Path $pipxVenvs "nestra-ai\Scripts\python.exe") -m nestra integrations install
+```
+
 This makes `/nestra` available in Claude Code and Gemini CLI. Codex uses the current Agent Skills syntax: invoke `$nestra`, or open `/skills` and choose NESTRA. Inspect without changing files with `nestra integrations status` or `nestra integrations install --dry-run`. Existing modified commands are never overwritten unless `--force` is supplied; forced updates create timestamped backups.
 
-The adapters are deliberately thin: they ask the host AI CLI to call the local `nestra` executable and surface its evidence, verification state, route, latency, and provider-token usage. They do not turn NESTRA into an agent and do not make the host CLI's own model tokens disappear. For true pre-model savings, integrate the Python runtime or HTTP gateway before the application's LLM call.
+The adapters are deliberately thin: they ask the host AI CLI to call the local NESTRA engine and surface its evidence, verification state, route, latency, and provider-token usage. The installer embeds the interpreter path as a fallback when a generated launcher is blocked. The adapters do not turn NESTRA into an agent and do not make the host CLI's own model tokens disappear. For true pre-model savings, integrate the Python runtime or HTTP gateway before the application's LLM call.
 
 ## Five-minute CLI flow
 
@@ -122,18 +129,19 @@ The standard-library gateway exposes health, ingestion, route planning, querying
 ## Accuracy, safety, and monitoring
 
 - External retrieval defaults to untrusted; vector similarity never implies trust.
+- Retrieval-only completion requires a topical match unless the user explicitly asks for a generic source listing.
 - Sensitivity and evidence prompt-injection gates run before provider calls.
 - Project IDs cannot traverse the filesystem; snapshots use atomic replacement.
-- The gateway applies constant-time bearer comparison, body limits, security headers, rate limits, and concurrency limits.
+- The gateway applies constant-time bearer comparison, strict body framing, security headers, rate limits across all `/v1/*` requests, bounded request threads, and socket/concurrency limits.
 - Audits omit prompts, evidence, credentials, and token values.
 - Results expose selected route, citations, guard outcome, calls, latency, token categories, and alerts.
-- Failed Full verification fails closed with `needs_review` by default.
+- Meso/Full verification requires lexical and numeric support from the cited evidence; failed Full verification fails closed with `needs_review` by default.
 
 NESTRA is a control layer, not a replacement for tenant isolation, a secret manager, network sandboxing, or provider-side safety controls. Read the [threat model](docs/threat-model.md).
 
 ## Honest evaluation status
 
-The network-free suite currently passes all seven safety/routing cases with zero provider tokens. The live oracle compares direct GPT-5.6, local BM25 RAG + GPT-5.6, fixed NESTRA, adaptive NESTRA, pre-gated Micro, Micro-100, and an accuracy-locked cascade on the same seeded HotpotQA examples.
+The network-free suite currently passes all eight safety/routing cases with zero provider tokens, including an out-of-domain retrieval regression. The live oracle compares direct GPT-5.6, local BM25 RAG + GPT-5.6, fixed NESTRA, adaptive NESTRA, pre-gated Micro, Micro-100, and an accuracy-locked cascade on the same seeded HotpotQA examples.
 
 Historical 12-question results found Micro-100 averaged 87.6 tokens with token F1 0.686, while Adaptive averaged 1,416 tokens with F1 0.842. That makes Micro interesting, not proven. The bundled learned artifact is deliberately `experimental`: its small calibration set could not satisfy the required 0.90 Micro precision, so it disables Micro. The repository therefore demonstrates the complete ML pipeline without pretending that the tiny model already produces savings.
 

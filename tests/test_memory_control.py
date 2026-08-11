@@ -2,8 +2,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from nestra import (
     GoalController,
+    HookBus,
+    MetricsCollector,
     ScopedMemory,
     create_fixed_nestra_plan,
     retention_score,
@@ -80,3 +84,47 @@ def test_topology_has_every_role_and_exact_budget():
     plan = create_fixed_nestra_plan(100)
     assert validate_nestra_plan(plan)
     assert sum(row["budget"] for row in plan["roles"]) == 100
+
+
+def test_archived_memory_is_not_counted_repeatedly_and_restore_is_strict():
+    created = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    memory = ScopedMemory(clock=lambda: created)
+    row = memory.write(
+        scope="project",
+        namespace="alpha",
+        content="old",
+        trust="trusted",
+        halfLifeMs=1_000,
+        ttlMs=None,
+    )
+    at = created + timedelta(seconds=3)
+    assert memory.decay(now=at)["archived"] == 1
+    assert memory.decay(now=at)["archived"] == 0
+    assert memory.records[row["id"]]["status"] == "archived"
+    incomplete = {
+        "id": "mem-bad",
+        "scope": "project",
+        "createdAt": created.isoformat(),
+        "lastUsedAt": created.isoformat(),
+    }
+    with pytest.raises(ValueError, match="required fields"):
+        memory.restore(incomplete)
+    with pytest.raises(ValueError, match="Duplicate memory id"):
+        memory.restore(row)
+
+
+def test_metrics_and_hooks_are_safe_under_concurrent_updates():
+    from concurrent.futures import ThreadPoolExecutor
+
+    metrics = MetricsCollector()
+    hooks = HookBus(max_trace=2_000)
+
+    def record(index: int) -> None:
+        metrics.record({"route": "retrieval", "status": "completed", "totalTokens": 0})
+        hooks.emit("done", {"index": index})
+
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        list(pool.map(record, range(1_000)))
+    assert metrics.snapshot()["requests"] == 1_000
+    assert metrics.snapshot()["routes"] == {"retrieval": 1_000}
+    assert len(hooks.trace()) == 1_000

@@ -21,7 +21,7 @@ def test_installs_native_adapters_for_supported_ai_clis(tmp_path: Path):
     codex = tmp_path / ".agents" / "skills" / "nestra" / "SKILL.md"
     claude = tmp_path / ".claude" / "skills" / "nestra" / "SKILL.md"
     gemini = tmp_path / ".gemini" / "commands" / "nestra.toml"
-    assert "Use the installed `nestra` CLI" in codex.read_text(encoding="utf-8")
+    assert "does not depend on a generated launcher" in codex.read_text(encoding="utf-8")
     assert "disable-model-invocation: true" in claude.read_text(encoding="utf-8")
     assert "{{args}}" in gemini.read_text(encoding="utf-8")
     assert all(record["status"] == "installed" for record in integration_status(home=tmp_path))
@@ -65,3 +65,14 @@ def test_single_target_can_be_passed_as_a_string(tmp_path: Path):
     [record] = install_integrations("claude", home=tmp_path)
     assert record["target"] == "claude"
     assert not (tmp_path / ".agents").exists()
+
+
+def test_installed_adapter_contains_module_fallback_for_blocked_launchers(tmp_path: Path):
+    executable = tmp_path / "Program Files" / "Python" / "python.exe"
+    install_integrations("codex", home=tmp_path, python_executable=executable)
+    skill = (tmp_path / ".agents" / "skills" / "nestra" / "SKILL.md").read_text(encoding="utf-8")
+    assert f'"{executable.resolve()}" -m nestra' in skill
+    assert "python -m nestra" not in skill
+    assert "`nestra list`" not in skill
+    [status] = integration_status("codex", home=tmp_path, python_executable=executable)
+    assert status["status"] == "installed"

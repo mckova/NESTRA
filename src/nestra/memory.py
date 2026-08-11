@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Iterable
 
 SCOPES = {"user", "project", "session", "mission", "team", "agent"}
+STATUSES = {"active", "cooling", "archived"}
 
 
 class ScopedMemory:
@@ -49,6 +50,9 @@ class ScopedMemory:
         ):
             raise ValueError("memory.visibility must be a non-empty list of strings.")
         ttl_value = input_.get("ttlMs", 86_400_000)
+        status = str(input_.get("status", "active"))
+        if status not in STATUSES:
+            raise ValueError(f"memory.status must be one of {', '.join(sorted(STATUSES))}.")
         row = {
             "id": memory_id,
             "scope": scope,
@@ -68,7 +72,7 @@ class ScopedMemory:
             "ttlMs": None
             if "ttlMs" in input_ and ttl_value is None
             else _positive(ttl_value, 86_400_000),
-            "status": input_.get("status", "active"),
+            "status": status,
             "visibility": list(dict.fromkeys(str(item).strip() for item in visibility)),
             "createdAt": _iso(now),
             "lastUsedAt": _iso(now),
@@ -159,7 +163,7 @@ class ScopedMemory:
                 del self.records[memory_id]
                 summary["deleted"] += 1
                 self._emit("memory.deleted", row, expired=expired, retentionScore=score)
-            elif score < archive_threshold:
+            elif score < archive_threshold and row["status"] != "archived":
                 row["status"] = "archived"
                 summary["archived"] += 1
                 self._emit("memory.archived", row, retentionScore=score)
@@ -190,13 +194,9 @@ class ScopedMemory:
         return {"schemaVersion": 1, "records": self.snapshot(include_content=True)}
 
     def restore(self, row: dict[str, Any]) -> None:
-        if not isinstance(row, dict) or not isinstance(row.get("id"), str):
-            raise ValueError("Invalid memory record.")
-        _scope(row.get("scope"))
-        _date(row.get("createdAt"))
-        _date(row.get("lastUsedAt"))
-        restored = deepcopy(row)
-        restored["trust"] = "trusted" if row.get("trust") == "trusted" else "untrusted"
+        restored = _validate_restored_record(row)
+        if restored["id"] in self.records:
+            raise ValueError(f"Duplicate memory id: {restored['id']}")
         self.records[restored["id"]] = restored
         if restored["id"].startswith("mem-") and restored["id"][4:].isdigit():
             self.sequence = max(self.sequence, int(restored["id"][4:]))
@@ -265,3 +265,80 @@ def _date(value: object) -> datetime:
 
 def _iso(value: datetime) -> str:
     return _date(value).astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _validate_restored_record(row: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(row, dict):
+        raise ValueError("Invalid memory record.")
+    required = {
+        "id",
+        "scope",
+        "namespace",
+        "kind",
+        "content",
+        "trust",
+        "confidence",
+        "relevance",
+        "sourceQuality",
+        "verifiedUtility",
+        "sensitivity",
+        "reuseCount",
+        "halfLifeMs",
+        "ttlMs",
+        "status",
+        "visibility",
+        "createdAt",
+        "lastUsedAt",
+        "metadata",
+    }
+    missing = required - set(row)
+    extra = set(row) - required
+    if missing:
+        raise ValueError("Invalid memory record: required fields are missing.")
+    if extra:
+        raise ValueError("Invalid memory record: unsupported fields are present.")
+    if not isinstance(row["id"], str) or not row["id"].strip():
+        raise ValueError("Invalid memory record id.")
+    _scope(row["scope"])
+    for key in ("namespace", "kind", "content"):
+        if not isinstance(row[key], str) or not row[key].strip():
+            raise ValueError(f"Invalid memory record {key}.")
+    if row["trust"] not in {"trusted", "untrusted"}:
+        raise ValueError("Invalid memory record trust.")
+    for key in ("confidence", "relevance", "sourceQuality", "verifiedUtility", "sensitivity"):
+        value = row[key]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 <= value <= 1:
+            raise ValueError(f"Invalid memory record {key}.")
+    if (
+        isinstance(row["reuseCount"], bool)
+        or not isinstance(row["reuseCount"], int)
+        or row["reuseCount"] < 0
+    ):
+        raise ValueError("Invalid memory record reuseCount.")
+    if (
+        isinstance(row["halfLifeMs"], bool)
+        or not isinstance(row["halfLifeMs"], (int, float))
+        or not math.isfinite(float(row["halfLifeMs"]))
+        or row["halfLifeMs"] <= 0
+    ):
+        raise ValueError("Invalid memory record halfLifeMs.")
+    if row["ttlMs"] is not None and (
+        isinstance(row["ttlMs"], bool)
+        or not isinstance(row["ttlMs"], (int, float))
+        or not math.isfinite(float(row["ttlMs"]))
+        or row["ttlMs"] <= 0
+    ):
+        raise ValueError("Invalid memory record ttlMs.")
+    if row["status"] not in STATUSES:
+        raise ValueError("Invalid memory record status.")
+    if (
+        not isinstance(row["visibility"], list)
+        or not row["visibility"]
+        or not all(isinstance(item, str) and item.strip() for item in row["visibility"])
+    ):
+        raise ValueError("Invalid memory record visibility.")
+    _date(row["createdAt"])
+    _date(row["lastUsedAt"])
+    if not isinstance(row["metadata"], dict):
+        raise ValueError("Invalid memory record metadata.")
+    return deepcopy(row)

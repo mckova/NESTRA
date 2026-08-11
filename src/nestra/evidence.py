@@ -7,6 +7,33 @@ from typing import Any
 
 from .project_memory import compile_project_memory, estimate_tokens, tokenize_project_text
 
+GROUNDING_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "as",
+    "at",
+    "by",
+    "for",
+    "from",
+    "in",
+    "is",
+    "of",
+    "on",
+    "the",
+    "to",
+    "was",
+    "were",
+    "with",
+    "את",
+    "ב",
+    "ה",
+    "ו",
+    "ל",
+    "מ",
+    "של",
+}
+
 
 def compile_atomic_evidence(
     question: str,
@@ -48,6 +75,9 @@ def compile_atomic_evidence(
                 "text": text,
                 "promptText": prompt_text,
                 "originalText": atom["text"],
+                "documentId": atom["documentId"],
+                "retrievalScore": atom["retrievalScore"],
+                "provenance": atom["provenance"],
                 "docIndex": title_to_index.get(atom["title"], len(atoms)),
                 "sentenceIndex": atom["provenance"].get("sentenceIndex", 0),
                 "estimatedTokens": estimate_tokens(prompt_text),
@@ -65,7 +95,8 @@ def compile_atomic_evidence(
         "atoms": atoms,
         "evidenceText": evidence_text,
         "estimatedTotalTokens": estimate_tokens(f"Q:{question}\nE:\n{evidence_text}\n{instruction}")
-        + max_output_tokens,
+        + max_output_tokens
+        + provider_reserve_tokens,
         "targetTotalTokens": target_total_tokens,
         "maxOutputTokens": max_output_tokens,
         "instruction": instruction,
@@ -107,6 +138,8 @@ def evaluate_accuracy_lock(
     grounded = bool(normalized and normalized in evidence)
     if not normalized or normalized == "unknown":
         reasons.append("empty_or_unknown")
+    if normalized and not answer_tokens:
+        reasons.append("answer_not_grounded")
     if len(answer_tokens) > max_answer_tokens:
         reasons.append("answer_too_long")
     if (
@@ -139,6 +172,43 @@ def evaluate_accuracy_lock(
         "reasons": list(dict.fromkeys(reasons)),
         "grounded": grounded,
         "binary": binary,
+    }
+
+
+def evaluate_structured_answer_support(
+    answer: object,
+    evidence_atoms: list[dict[str, Any]],
+    *,
+    minimum_token_coverage: float = 0.8,
+) -> dict[str, Any]:
+    """Fail closed when a structured answer is not lexically supported by its citations."""
+
+    normalized = _normalize_answer(answer)
+    answer_tokens = [
+        token for token in tokenize_project_text(normalized) if token not in GROUNDING_STOPWORDS
+    ]
+    evidence_text = "\n".join(str(atom.get("text") or "") for atom in evidence_atoms)
+    evidence_tokens = set(tokenize_project_text(evidence_text))
+    supported = [token for token in answer_tokens if token in evidence_tokens]
+    coverage = len(supported) / max(1, len(answer_tokens))
+    answer_numbers = set(re.findall(r"\d+(?:[.,]\d+)?", normalized))
+    evidence_numbers = set(re.findall(r"\d+(?:[.,]\d+)?", evidence_text.lower()))
+    reasons: list[str] = []
+    if not normalized or normalized == "unknown":
+        reasons.append("empty_or_unknown")
+    if normalized and not answer_tokens:
+        reasons.append("answer_not_grounded")
+    if not evidence_atoms:
+        reasons.append("missing_cited_evidence")
+    if answer_tokens and coverage < minimum_token_coverage:
+        reasons.append("answer_not_grounded")
+    if answer_numbers - evidence_numbers:
+        reasons.append("unsupported_numeric_claim")
+    return {
+        "accepted": not reasons,
+        "reasons": list(dict.fromkeys(reasons)),
+        "tokenCoverage": round(coverage, 6) if answer_tokens else 0,
+        "unsupportedNumbers": sorted(answer_numbers - evidence_numbers),
     }
 
 

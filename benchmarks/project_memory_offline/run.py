@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
-from nestra import compile_project_memory, evaluate_pre_call_gate  # noqa: E402
+from nestra import compile_project_memory, evaluate_pre_call_gate, route_nestra_query  # noqa: E402
 
 
 def main() -> int:
@@ -32,7 +32,17 @@ def main() -> int:
             limit=8,
         )
         latency = (time.perf_counter() - started) * 1000
-        gate = evaluate_pre_call_gate(fixture["question"], recall, **fixture.get("gate", {}))
+        gate = (
+            route_nestra_query(
+                question=fixture["question"],
+                safe_recall=recall,
+                raw_recall=recall,
+                expanded_recall=recall,
+                mode=fixture.get("mode", "auto"),
+            )
+            if fixture.get("evaluation") == "route"
+            else evaluate_pre_call_gate(fixture["question"], recall, **fixture.get("gate", {}))
+        )
         missing = [
             reason for reason in fixture.get("expectedReasons", []) if reason not in gate["reasons"]
         ]

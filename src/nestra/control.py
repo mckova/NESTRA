@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timezone
+from threading import RLock
 from typing import Any, Callable
 
 
@@ -16,10 +17,18 @@ class HookBus:
         self.max_trace = max(1, max_trace)
         self.handlers: defaultdict[str, list[Callable[[dict[str, Any]], Any]]] = defaultdict(list)
         self.events: list[dict[str, Any]] = []
+        self._lock = RLock()
 
     def on(self, name: str, handler: Callable[[dict[str, Any]], Any]) -> Callable[[], None]:
-        self.handlers[name].append(handler)
-        return lambda: self.handlers[name].remove(handler)
+        with self._lock:
+            self.handlers[name].append(handler)
+
+        def unsubscribe() -> None:
+            with self._lock:
+                if handler in self.handlers[name]:
+                    self.handlers[name].remove(handler)
+
+        return unsubscribe
 
     def emit(self, name: str, payload: dict[str, Any] | None = None) -> None:
         event = {
@@ -27,13 +36,16 @@ class HookBus:
             "at": self.clock().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
             **(payload or {}),
         }
-        self.events.append(event)
-        self.events = self.events[-self.max_trace :]
-        for handler in tuple(self.handlers[name]):
+        with self._lock:
+            self.events.append(event)
+            self.events = self.events[-self.max_trace :]
+            handlers = tuple(self.handlers[name])
+        for handler in handlers:
             handler(deepcopy(event))
 
     def trace(self) -> list[dict[str, Any]]:
-        return deepcopy(self.events)
+        with self._lock:
+            return deepcopy(self.events)
 
 
 class GoalController:
