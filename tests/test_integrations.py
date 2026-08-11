@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import shlex
 from pathlib import Path
 
 import pytest
@@ -71,7 +73,9 @@ def test_installed_adapter_contains_module_fallback_for_blocked_launchers(tmp_pa
     executable = tmp_path / "Program Files" / "Python" / "python.exe"
     install_integrations("codex", home=tmp_path, python_executable=executable)
     skill = (tmp_path / ".agents" / "skills" / "nestra" / "SKILL.md").read_text(encoding="utf-8")
-    assert f'"{executable.resolve()}" -m nestra' in skill
+    resolved = str(executable.resolve())
+    quoted = f'"{resolved}"' if os.name == "nt" else shlex.quote(resolved)
+    assert f"{quoted} -m nestra" in skill
     assert "python -m nestra" not in skill
     assert "`nestra list`" not in skill
     [status] = integration_status("codex", home=tmp_path, python_executable=executable)
