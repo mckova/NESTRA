@@ -1,0 +1,30 @@
+{
+  "source": "Local NESTRA source snapshot; Git revision unavailable",
+  "copied_files": [
+    {
+      "upstream_path": "LICENSE",
+      "showcase_path": "LICENSE",
+      "sha256": "298f810a13c19a51b7a643c2b2b0c38b682c361ed9801ec72921ab02568dba7a",
+      "modified": false
+    },
+    {
+      "upstream_path": "src/nestra/project_memory.py",
+      "showcase_path": "src/nestra_core/project_memory.py",
+      "sha256": "36e85786ee0d6dabbcd68e43ad8640ef1b41e3e02afe3891026312a368653293",
+      "modified": false
+    },
+    {
+      "upstream_path": "src/nestra/memory.py",
+      "showcase_path": "src/nestra_core/memory.py",
+      "sha256": "4700545179fc4441b08bf93815cc870254061cff3df203d21254a573eed55559",
+      "modified": false
+    },
+    {
+      "upstream_path": "src/nestra/security.py",
+      "showcase_path": "src/nestra_core/security.py",
+      "sha256": "678c09f3c0b353bb827f566929a1a3263a706d082b8a58be94ad3efe037fb3dc",
+      "modified": false
+    }
+  ],
+  "note": "Only these reviewed files were copied. Showcase wrappers, fixtures and tests are newly authored. Original copyright attribution is retained."
+}

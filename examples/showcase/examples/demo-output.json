@@ -1,0 +1,119 @@
+[
+  {
+    "case_id": "supported",
+    "generated_answer": null,
+    "policy": {
+      "coverage_rule": "informative_query_tokens_in_excerpt",
+      "layer": "showcase_policy",
+      "maximum_sensitivity": 0.5,
+      "minimum_query_coverage": 1.0,
+      "reason_codes": [
+        "eligible_source_matches"
+      ]
+    },
+    "provider": {
+      "calls": 0,
+      "configured": false
+    },
+    "question": "מה שעות התמיכה בצוות נרקיס?",
+    "retrieval": {
+      "candidates_considered": 4,
+      "engine": "NESTRA lexical project memory"
+    },
+    "sources": [
+      {
+        "document_id": "support-hours",
+        "excerpt": "שעות התמיכה בצוות נרקיס הן בימים ראשון עד חמישי, בין 18:00 ל־21:00.",
+        "id": "fact-72caaa105d055a9b",
+        "provenance": {
+          "contentHash": "f4a7ef297826d0c86d9abbde",
+          "documentId": "support-hours",
+          "projectId": "fictional-narkis",
+          "sentenceIndex": 0,
+          "sourceUri": "fixture://narkis/support-hours",
+          "title": "שעות תמיכה"
+        },
+        "query_coverage": 1.0,
+        "source_uri": "fixture://narkis/support-hours",
+        "title": "שעות תמיכה"
+      }
+    ],
+    "status": "sources_found",
+    "title": "שאלה עם מקור מורשה"
+  },
+  {
+    "case_id": "insufficient",
+    "generated_answer": null,
+    "policy": {
+      "coverage_rule": "informative_query_tokens_in_excerpt",
+      "layer": "showcase_policy",
+      "maximum_sensitivity": 0.5,
+      "minimum_query_coverage": 1.0,
+      "reason_codes": [
+        "insufficient_lexical_coverage"
+      ]
+    },
+    "provider": {
+      "calls": 0,
+      "configured": false
+    },
+    "question": "מה תחזית מזג האוויר בחיפה מחר?",
+    "retrieval": {
+      "candidates_considered": 4,
+      "engine": "NESTRA lexical project memory"
+    },
+    "sources": [],
+    "status": "no_evidence",
+    "title": "שאלה ללא ראיות"
+  },
+  {
+    "case_id": "untrusted",
+    "generated_answer": null,
+    "policy": {
+      "coverage_rule": "informative_query_tokens_in_excerpt",
+      "layer": "showcase_policy",
+      "maximum_sensitivity": 0.5,
+      "minimum_query_coverage": 1.0,
+      "reason_codes": [
+        "untrusted_source"
+      ]
+    },
+    "provider": {
+      "calls": 0,
+      "configured": false
+    },
+    "question": "מה תקרת ההחזר לציוד בצוות נרקיס?",
+    "retrieval": {
+      "candidates_considered": 4,
+      "engine": "NESTRA lexical project memory"
+    },
+    "sources": [],
+    "status": "blocked",
+    "title": "מקור שאינו מהימן"
+  },
+  {
+    "case_id": "restricted",
+    "generated_answer": null,
+    "policy": {
+      "coverage_rule": "informative_query_tokens_in_excerpt",
+      "layer": "showcase_policy",
+      "maximum_sensitivity": 0.5,
+      "minimum_query_coverage": 1.0,
+      "reason_codes": [
+        "sensitive_source"
+      ]
+    },
+    "provider": {
+      "calls": 0,
+      "configured": false
+    },
+    "question": "מי מחזיקי הרשאת חדר ניסוי בצוות נרקיס?",
+    "retrieval": {
+      "candidates_considered": 4,
+      "engine": "NESTRA lexical project memory"
+    },
+    "sources": [],
+    "status": "blocked",
+    "title": "מקור שאסור להצגה במדיניות הדמו"
+  }
+]

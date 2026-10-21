@@ -16,6 +16,16 @@ NESTRA is not an agent framework. An application, API, RAG pipeline, or agent ma
 
 [עברית](README.he.md) · [Architecture](docs/architecture.md) · [Python API](docs/api.md) · [CLI](docs/cli.md) · [Learned router](docs/learned-router.md) · [Evaluation](docs/evaluation.md) · [Security](SECURITY.md)
 
+## Offline Hebrew showcase
+
+Try the [standalone showcase](examples/showcase/README.md) ([עברית](examples/showcase/README.he.md)) for deterministic source retrieval, abstention, and trust/sensitivity decisions over invented procedures. It requires only an existing Python interpreter, uses no network or API key, and does not generate LLM answers.
+
+```bash
+cd examples/showcase
+python -I -B demo.py
+python -I -B run_checks.py
+```
+
 ## Why it is different
 
 | Route | Model calls | Decision |
