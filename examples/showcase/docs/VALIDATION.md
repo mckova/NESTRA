@@ -1,35 +1,52 @@
-# Local validation — 2026-10-21
+# Local validation record
 
-## Recorded result
+## English correction: staged standalone checks passed
 
-On Windows, using the existing Python **3.13.12** interpreter, the integration reviewer ran:
+The authored demo, fixtures, CLI help/output, tests and documentation are corrected to English. The independent test agent ran `python -I -B run_checks.py` against the corrected stage: **23 tests passed; exit code 0**. This included the English runtime fixtures/schema, CLI text/help, README language/link checks, authored Python language checks, copied-core hashes, disclosure/abstention and scratch-handling regressions. The agent also reported the selected Ruff lint and formatting checks passed for its owned test files.
+
+The integration reviewer independently reran the corrected stage: **23 tests passed; exit code 0**. Actual English text and JSON output matched the newly captured examples. Both samples were ASCII, had the four expected statuses and reported zero provider calls. The complete showcase Ruff lint and formatting checks below passed. The documentation agent checked its six owned documents for Hebrew script and the removed language link; both checks passed. Final review covered all 22 selected files, checked links and private-path/token patterns, and reconfirmed copied-file hashes. Repository-wide CI status must be checked in GitHub Actions for the published commit; local results do not establish CI success.
+
+The copied core retains its multilingual regular-expression patterns as verbatim algorithm data. The English correction does not translate those patterns, change upstream attribution or replace the original license.
+
+From `examples/showcase`, verify the corrected revision with the existing interpreter:
 
 ```powershell
 python -I -B run_checks.py
+python -I -B demo.py
+python -I -B demo.py --json
+python -I -B demo.py --help
 ```
 
-**23 tests passed; exit code 0.** The independent test agent also completed the same 23-test suite successfully. Python 3.10+ is the source compatibility target, but this task exercised only 3.13.12.
+The standalone suite checked determinism, all four policy outcomes, zero provider calls, blocked-source disclosure and copied-file digests. The integration reviewer recaptured both example files from the CLI. Final artifact review confirmed the authored docs, fixtures, help/output and tests contain no Hebrew script. Inherited regex algorithm data is outside that translation boundary.
 
-The checked contracts include:
+The integration reviewer ran these checks successfully from the repository root using the existing Ruff installation. No installation is required or authorized by this record:
 
-- Verbatim copied-file hashes, preserved attribution, and standard-library/local imports only.
+```powershell
+python -I -B -m ruff format --check --isolated --no-cache --line-length 100 --target-version py310 examples/showcase
+python -I -B -m ruff check --isolated --no-cache --select E4,E7,E9,F,I --target-version py310 examples/showcase
+```
+
+## Historical results: earlier revisions, 2026-10-21
+
+On Windows with the existing Python **3.13.12** interpreter, the independent test agent and integration reviewer each observed **23 tests passed; exit code 0** before the English correction. The earlier staged revision also passed the same suite and the Ruff commands above. Its text and JSON CLI output matched the then-current captured examples. These are historical observations, not current correction results.
+
+The checked contracts included:
+
+- Copied-file hashes, preserved attribution, and standard-library/local imports only.
 - Snapshot integrity, mutation isolation and project-identifier validation.
-- Real fixture provenance, unsupported/near-topic/title-only abstention, and repeatable output.
+- Fixture provenance, unsupported/near-topic/title-only abstention, and repeatable output.
 - Untrusted and sensitivity-restricted source content, identifiers, titles and references absent from returned output.
 - Detected source/question instruction patterns blocked; invalid policy numbers rejected.
 - Network, environment reads and file I/O denied by runtime test patches during evaluation.
-- CLI JSON identical across fresh isolated processes; one-case selection works; an invalid case exits unsuccessfully without a traceback. CLI scratch directories stay empty.
+- CLI JSON identical across fresh isolated processes; one-case selection and clean invalid-case failure; empty CLI scratch directories.
 
-The runtime patches exercise evaluation after imports. They are scoped checks, not an operating-system network sandbox or proof about every possible upstream configuration. The application code was also inspected before execution. It imports no network client, provider adapter or process launcher.
+Runtime patches exercise evaluation after imports. They are scoped checks, not an operating-system network sandbox or proof about every upstream configuration. Application code was inspected before execution and imported no network client, provider adapter or process launcher.
 
-## Actual CLI examples
+Python 3.10+ is the source compatibility target. An actual Python 3.10 interpreter was not run. A simulated diagnostic fallback covers its lack of `BaseException.add_note`.
 
-Both files in `examples/` were captured from the actual CLI, not written as illustrative answers:
+## Expected fixture behavior
 
-```powershell
-python -I -B demo.py
-python -I -B demo.py --json
-```
+This table describes the contract to verify, not a new observed result:
 
 | Fixture | Result | Released evidence |
 |---|---|---|
@@ -38,39 +55,26 @@ python -I -B demo.py --json
 | `untrusted` | `blocked` | None |
 | `restricted` | `blocked` | None |
 
-All four results have `generated_answer: null` and zero provider calls. No LLM was run. The deterministic fixture clock is not a live audit time.
+Every result must have `generated_answer: null` and zero provider calls. No LLM is run. The deterministic fixture clock is not a live audit time. Captured files in `examples/` should come from the actual corrected CLI, not manually written illustrative answers.
 
-## Original source and artifact boundary
+## Historical source and artifact review
 
-The original NESTRA directory was read only. A private before/after comparison found **1,240 file metadata entries unchanged**, and **all four allowlisted source-file SHA-256 hashes unchanged**. The metadata comparison excludes `.git` and symlink directories; only the four selected files received content hashes. This is not a full content audit of every original file. Git was not run.
+During initial extraction, the original NESTRA directory was read only. A private before/after comparison found **1,240 file metadata entries unchanged**, and **all four allowlisted source-file SHA-256 hashes unchanged**. The metadata comparison excluded `.git` and symlink directories; only the four selected files received content hashes. This was not a full content audit of every original file. Git was not run. This documentation correction does not repeat that original-source comparison.
 
-The deliverable contains only the explicit source subset, new wrapper, synthetic fixtures, tests, documentation and captured fixture output. A bounded file inventory found no copied `.git`, `.env`, `.nestra`, caches, logs or personal absolute paths. No private source-review evidence belongs in this showcase. The test logs and source metadata are kept in a separate private sibling directory.
+The corrected stage's bounded inventory contains exactly 22 selected files after removal of the translated README variant. It includes no `.git`, `.env`, `.nestra`, caches, logs, private review evidence or personal absolute paths. Private test logs and source metadata stay outside the showcase.
 
-## Initial test-harness issue
+## Historical test-harness repair
 
-The first 20-test run reported 17 passes and three cleanup errors: Windows denied removal of sandbox-managed temporary directories after CLI subprocess checks. The denied cleanup was not retried. Future test scratch was placed inside the explicitly writable workspace and removed only when empty. The final 23-test suite passed with that harness. Private execution notes retain the denied targets; these paths are unrelated to the original source.
+The first 20-test run reported 17 passes and three cleanup errors: Windows denied removal of sandbox-managed temporary directories after CLI subprocess checks. The denied cleanup was not retried. Future scratch was placed inside the explicitly writable workspace and removed only when empty.
 
-### Follow-up repair
+A later repair prevents cleanup exceptions from replacing a preceding subprocess or assertion failure. Scratch handling preserves the primary failure, reports cleanup failures distinctly, tolerates an already absent directory, and retains unexpected output while failing the test. It uses no recursive deletion, permission change, retry or fallback to system Temp. Scratch creation uses the workspace `tests` directory; residual `.cli-check-*` directories are excluded by `.gitignore`.
 
-The remaining harness issue was that an exception in the cleanup `finally` block could replace a preceding subprocess or assertion failure. Scratch handling now preserves the primary failure, reports cleanup failures distinctly, tolerates a directory already absent during cleanup, and retains unexpected CLI output while still failing the test. There is no recursive deletion, permission change, retry or fallback to system Temp. Scratch creation uses the explicit workspace `tests` directory; residual `.cli-check-*` directories are excluded by `.gitignore`.
+Regression subtests simulated cleanup denial, a primary subprocess failure, an absent directory and unexpected output without accessing old denied paths. Historical read-only checks of those exact paths returned `FileNotFoundError`; no deletion was attempted, and the checks did not establish who removed them or what another sandbox session could see.
 
-Regression subtests simulate cleanup denial, a primary subprocess failure, an absent directory and unexpected output without accessing the old denied paths. Read-only checks of the three exact historical paths returned `FileNotFoundError` in the current session. No deletion was attempted; the checks do not establish who removed those paths or what another sandbox session can see.
+After this repair, both reviewers observed the earlier 23-test suite pass, text/JSON samples match and no new scratch directories remain. Source metadata and selected hashes also remained unchanged then. None of these historical checks authorizes retrying a denied operation.
 
-After the repair, the independent test agent and integration reviewer each reran all **23 tests successfully**. The reviewer also reran both text and JSON demos: both exited with code 0, matched the existing captured examples exactly, and reported zero provider calls. No new `.cli-check-*` directories remained. The source metadata and four selected hashes were rechecked and remained unchanged. A simulated diagnostic fallback covers Python 3.10's lack of `BaseException.add_note`; an actual Python 3.10 interpreter was not run.
+## Scope and release boundary
 
-## Existing-repository integration checks
+The full upstream release suite and repository-wide CI success are not claimed. Standalone checks validate only this extracted showcase. Lexical overlap does not establish semantic entailment; fixture trust/sensitivity are author-assigned labels. No model-quality, token-saving or production-security result is claimed.
 
-For inclusion under `examples/showcase`, the newly authored launchers, wrapper and tests were aligned with the existing repository's Ruff formatting/import rules. The copied core and license remain byte-identical to `PROVENANCE.json`. The 23-test suite passed again in the staged directory. Both staged CLI modes matched the captured examples. Repository-wide pytest and release validation are separate from this standalone suite and are run by the existing GitHub CI; no CI success is inferred from these local results.
-
-The local Ruff checks passed using the repository's selected rules and Python target:
-
-```powershell
-python -I -B -m ruff format --check --isolated --no-cache --line-length 100 --target-version py310 examples/showcase
-python -I -B -m ruff check --isolated --no-cache --select E4,E7,E9,F,I --target-version py310 examples/showcase
-```
-
-## Scope of the recorded checks
-
-The full upstream release suite was not run or claimed. These checks validate only this extracted showcase. Lexical overlap does not establish semantic entailment; fixture trust/sensitivity are author-assigned labels. No model-quality, token-saving or production-security result is claimed.
-
-No packages were installed and no API, server, publication, upload or repository-permission change was performed. Before a public release, review the exact release files and rights/attribution, confirm that only this showcase is included, rerun checks on that selection, and obtain the user's separate publication decision. See [limitations](LIMITATIONS.md).
+This documentation correction performs no package installation, API call, server start, publication, upload or repository-permission change. Release operations follow the user's authorized workflow and require review of the exact selected files, rights/attribution and current captured output. See [limitations](LIMITATIONS.md).

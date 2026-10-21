@@ -56,12 +56,31 @@ class CoreIntegrityTests(unittest.TestCase):
                         self.assertNotIn(
                             name, forbidden, f"Network/process dependency: {path.name}: {name}"
                         )
+        # Only these verbatim upstream modules may retain Hebrew regex/token data.
+        # Their byte identity is independently enforced by the provenance test.
+        copied_core = {
+            "src/nestra_core/project_memory.py",
+            "src/nestra_core/memory.py",
+            "src/nestra_core/security.py",
+        }
+        authored_paths = paths + list((ROOT / "tests").glob("test_*.py")) + [ROOT / "run_checks.py"]
+        for path in authored_paths:
+            if path.relative_to(ROOT).as_posix() in copied_core:
+                continue
+            with self.subTest(language="English authored source", path=path.relative_to(ROOT)):
+                text = path.read_text(encoding="utf-8-sig")
+                self.assertFalse(any(0x0590 <= ord(char) <= 0x05FF for char in text))
+        with self.subTest(language="English showcase README"):
+            self.assertFalse((ROOT / "README.he.md").exists())
+            readme = (ROOT / "README.md").read_text(encoding="utf-8-sig")
+            self.assertNotIn("README.he.md", readme)
+            self.assertFalse(any(0x0590 <= ord(char) <= 0x05FF for char in readme))
 
     def test_snapshot_round_trip_and_tamper_rejection(self):
         document = {
             "id": "example-procedure",
-            "title": "נוהל מומצא",
-            "text": "נוהל מומצא קובע שמירת מסמך בתיקיית הדגמה.",
+            "title": "Fictional procedure",
+            "text": "The fictional procedure requires saving a document in a demonstration folder.",
             "trust": "trusted",
             "sourceUri": "fixture://example-procedure",
         }
@@ -72,23 +91,23 @@ class CoreIntegrityTests(unittest.TestCase):
         restored = restore_project_memory(exported)
         self.assertEqual(restored.export(), exported)
         tampered = deepcopy(exported)
-        tampered["facts"][0]["text"] = "הוראה שהמקור אינו מכיל"
+        tampered["facts"][0]["text"] = "An instruction absent from the source"
         with self.assertRaises(ValueError):
             restore_project_memory(tampered)
 
     def test_compilation_does_not_retain_caller_mutable_data(self):
         input_ = {
             "projectId": "detached",
-            "documents": [{"id": "doc", "title": "דוגמה", "text": "דוגמה מקורית."}],
+            "documents": [{"id": "doc", "title": "Example", "text": "Original example."}],
         }
         memory = compile_project_memory(input_, clock=FIXED_CLOCK)
         snapshot = memory.export()
-        input_["documents"][0]["text"] = "שינוי לאחר קליטה"
-        snapshot["documents"][0]["text"] = "שינוי לאחר ייצוא"
-        self.assertEqual(memory.export()["documents"][0]["text"], "דוגמה מקורית.")
+        input_["documents"][0]["text"] = "Modified after ingestion"
+        snapshot["documents"][0]["text"] = "Modified after export"
+        self.assertEqual(memory.export()["documents"][0]["text"], "Original example.")
 
     def test_project_identifier_cannot_traverse_paths(self):
-        for value in ("../secret", "..", "a/b", "a\\b", "", "שם"):
+        for value in ("../secret", "..", "a/b", "a\\b", "", "\u00e9"):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 validate_project_id(value)
 

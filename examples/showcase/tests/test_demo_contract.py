@@ -85,6 +85,10 @@ class DemoContractTests(unittest.TestCase):
                 self.assertEqual(result["provider"], {"configured": False, "calls": 0})
                 self.assertIsNone(result["generated_answer"])
                 self.assertIsInstance(result["policy"]["reason_codes"], list)
+        with self.subTest(language="English runtime fixtures and schema"):
+            self.assertTrue(json.dumps(results, ensure_ascii=False).isascii())
+            self.assertTrue(json.dumps(get_documents(), ensure_ascii=False).isascii())
+            self.assertTrue(all(row["question"].startswith(("What ", "Who ")) for row in results))
 
     def test_supported_excerpts_have_real_fixture_provenance(self):
         result = run_case("supported")
@@ -108,32 +112,41 @@ class DemoContractTests(unittest.TestCase):
         self.assertEqual(first, second)
 
     def test_no_overlap_cannot_be_supported_by_source_quality_alone(self):
-        documents = [source("opening", "נוהל פתיחה", "נוהל פתיחה קובע פתיחת הדלת בשעה שמונה.")]
-        result = evaluate_question("מה מחיר הטלסקופ?", documents)
+        documents = [source("opening", "Opening procedure", "The door opens at eight.")]
+        result = evaluate_question("What is the telescope price?", documents)
         self.assertEqual(result["status"], "no_evidence")
         self.assertEqual(result["sources"], [])
 
     def test_near_topic_missing_requested_detail_abstains(self):
-        documents = [source("support", "תמיכה", "צוות נרקיס מספק תמיכה בדואר אלקטרוני.")]
-        result = evaluate_question("האם צוות נרקיס מספק תמיכה בשבת?", documents)
+        documents = [source("support", "Support", "Team Narkis support is available by email.")]
+        result = evaluate_question("Is team Narkis support available on Saturday?", documents)
         self.assertEqual(result["status"], "no_evidence")
         self.assertEqual(result["sources"], [])
+        with self.subTest(control="same topic with supported detail"):
+            supported = evaluate_question("Is team Narkis support available by email?", documents)
+            self.assertEqual(supported["status"], "sources_found")
 
     def test_title_is_not_evidence_for_missing_detail(self):
-        documents = [source("title-only", "כתובת סניף ירושלים", "המסמך כולל ברכת פתיחה בלבד.")]
-        result = evaluate_question("מה כתובת סניף ירושלים?", documents)
+        documents = [
+            source(
+                "title-only",
+                "Jerusalem branch address",
+                "This document only contains a welcome message.",
+            )
+        ]
+        result = evaluate_question("What is the Jerusalem branch address?", documents)
         self.assertEqual(result["status"], "no_evidence")
 
     def test_untrusted_relevant_content_is_not_serialized(self):
-        marker = "סמן_סינתטי_לא_לחשיפה"
+        marker = "synthetic_marker_not_for_disclosure"
         document = source(
             "untrusted-document-unpublished",
-            "תיעוד פנימי מדומה",
-            f"מפתח המחסן נמצא בתיבה {marker}.",
+            "Synthetic internal document",
+            f"The warehouse key is in box {marker}.",
             trust="untrusted",
         )
         documents = [document]
-        result = evaluate_question("איפה מפתח המחסן?", documents)
+        result = evaluate_question("Where is the warehouse key?", documents)
         self.assertEqual(result["status"], "blocked")
         self.assertEqual(result["sources"], [])
         serialized = json.dumps(result, ensure_ascii=False)
@@ -141,15 +154,15 @@ class DemoContractTests(unittest.TestCase):
             self.assertNotIn(value, serialized)
 
     def test_sensitive_relevant_content_is_not_serialized(self):
-        marker = "סמן_סינתטי_מוגבל"
+        marker = "synthetic_restricted_marker"
         document = source(
             "sensitive-document-unpublished",
-            "תיעוד מוגבל מדומה",
-            f"תקציב הפיתוח כולל סעיף {marker}.",
+            "Synthetic restricted document",
+            f"The development budget includes item {marker}.",
             sensitivity=1.0,
         )
         documents = [document]
-        result = evaluate_question("מה תקציב הפיתוח?", documents)
+        result = evaluate_question("What is the development budget?", documents)
         self.assertEqual(result["status"], "blocked")
         self.assertEqual(result["sources"], [])
         serialized = json.dumps(result, ensure_ascii=False)
@@ -158,19 +171,29 @@ class DemoContractTests(unittest.TestCase):
 
     def test_unrelated_untrusted_source_does_not_suppress_supported_safe_source(self):
         documents = [
-            source("safe", "פתיחה", "שעות פתיחת המשרד הן תשע עד חמש."),
-            source("unrelated", "טיול", "טיול הדגמה כולל צילום פרחים.", trust="untrusted"),
+            source("safe", "Opening", "Office opening hours are nine to five."),
+            source(
+                "unrelated",
+                "Trip",
+                "The demonstration trip includes flower photography.",
+                trust="untrusted",
+            ),
         ]
-        result = evaluate_question("מה שעות פתיחת המשרד?", documents)
+        result = evaluate_question("What are the office opening hours?", documents)
         self.assertEqual(result["status"], "sources_found")
         self.assertEqual({row["document_id"] for row in result["sources"]}, {"safe"})
 
     def test_source_trust_is_explicitly_validated(self):
         documents = [
-            source("forged", "דוגמה", "שעות פתיחת המשרד הן תשע.", trust="trusted-because-I-say-so")
+            source(
+                "forged",
+                "Example",
+                "Office opening hours start at nine.",
+                trust="trusted-because-I-say-so",
+            )
         ]
         with self.assertRaises(ValueError):
-            evaluate_question("מה שעות פתיחת המשרד?", documents)
+            evaluate_question("What are the office opening hours?", documents)
 
     def test_question_instruction_pattern_blocks_before_retrieval(self):
         with mock.patch("nestra_showcase.app.compile_project_memory") as compile_index:
@@ -277,6 +300,19 @@ class CliTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["case_id"], "untrusted")
         self.assertEqual(rows[0]["status"], "blocked")
+        with self.subTest(language="English text output"):
+            text = self.run_cli("--case", "supported")
+            self.assertEqual(text.returncode, 0, text.stderr)
+            self.assertTrue(text.stdout.isascii())
+            self.assertIn("Question: What are the support hours for team Narkis?", text.stdout)
+            self.assertIn("Outcome: Eligible sources found", text.stdout)
+            self.assertIn("Provider: not configured | calls: 0", text.stdout)
+        with self.subTest(language="English CLI help"):
+            help_output = self.run_cli("--help")
+            self.assertEqual(help_output.returncode, 0, help_output.stderr)
+            self.assertTrue(help_output.stdout.isascii())
+            self.assertIn("fictional team policies only", help_output.stdout)
+            self.assertIn("Print deterministic JSON", help_output.stdout)
 
     def test_cli_invalid_case_and_scratch_failures_remain_visible(self):
         with self.subTest(phase="invalid case"):

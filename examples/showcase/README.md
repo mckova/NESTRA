@@ -1,8 +1,6 @@
 # NESTRA offline showcase
 
-[עברית](README.he.md)
-
-A small, deterministic Hebrew demonstration of **source retrieval and policy decisions** over invented team procedures. It uses a reviewed subset of NESTRA's lexical project-memory code. It does not generate an answer with an LLM.
+A small, deterministic English demonstration of **source retrieval and policy decisions** over invented team procedures. It uses a reviewed subset of NESTRA's lexical project-memory code. It does not generate an answer with an LLM.
 
 The demo shows a supported question with source excerpts, a question without sufficient evidence, and a relevant source that policy does not allow. Source snippets are shown only when the showcase policy permits them.
 
@@ -17,7 +15,7 @@ python -I -B demo.py --case supported
 python -I -B demo.py --help
 ```
 
-The text presentation is in Hebrew; JSON is suitable for inspection and testing. `--case` selects `supported`, `insufficient`, `untrusted`, or `restricted`. Both modes use the same application decisions.
+The text presentation is in English; JSON is suitable for inspection and testing. `--case` selects `supported`, `insufficient`, `untrusted`, or `restricted`. Both modes use the same application decisions.
 
 The launcher adds only this directory's `src` to its import path. `-I` isolates Python from user-level configuration and `PYTHONPATH`; `-B` prevents bytecode files. The demo reads no external documents or environment credentials, writes no persistent memory, and opens no server. Its fixture source references are labels, not URLs to fetch.
 
@@ -53,6 +51,8 @@ The checks use Python's standard-library test runner. They exercise the extracte
 The original source directory is not an import dependency. The private review evidence outside this showcase records hashes of the explicit copied-file allowlist and a before/after filesystem-metadata comparison of the source tree. It is not a full content-hash audit of every original file. Git history was not inspected.
 
 All fixture names, procedures and content are invented for this demonstration. Trust and sensitivity are fixture metadata supplied by the author, not automatically verified facts about a real organization.
+
+The authored documentation, demo, fixtures, CLI help/output and tests are in English. Multilingual regular-expression patterns inherited from the copied core are algorithm data retained verbatim. They are not demo prose and do not establish multilingual retrieval quality.
 
 ## Attribution and release status
 

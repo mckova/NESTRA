@@ -9,11 +9,15 @@ LICENSE contains the original MIT license text. PROVENANCE.json lists the
 upstream-relative paths, destination paths and SHA-256 digests of the files
 copied without edits.
 
-The showcase application wrapper, synthetic Hebrew fixtures, launchers,
+The showcase application wrapper, synthetic English fixtures, launchers,
 tests and documentation are newly authored for this local demonstration.
 The copied modules were placed in the nestra_core package; the original
 source checkout was not modified. No claim of exclusive authorship of the
 upstream code is made.
+
+The authored documentation, demo, fixtures, help/output and tests are in
+English. Multilingual regular-expression patterns in the inherited core
+are algorithm data retained verbatim, not translated demonstration prose.
 
 The fixture names, policies and source labels are invented. No real user,
 school, customer or private document data was copied for the demo.

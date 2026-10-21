@@ -15,7 +15,7 @@
       "calls": 0,
       "configured": false
     },
-    "question": "מה שעות התמיכה בצוות נרקיס?",
+    "question": "What are the support hours for team Narkis?",
     "retrieval": {
       "candidates_considered": 4,
       "engine": "NESTRA lexical project memory"
@@ -23,23 +23,23 @@
     "sources": [
       {
         "document_id": "support-hours",
-        "excerpt": "שעות התמיכה בצוות נרקיס הן בימים ראשון עד חמישי, בין 18:00 ל־21:00.",
-        "id": "fact-72caaa105d055a9b",
+        "excerpt": "The support hours for team Narkis are Sunday through Thursday from 18:00 to 21:00.",
+        "id": "fact-e3a73c97e09a4ecb",
         "provenance": {
-          "contentHash": "f4a7ef297826d0c86d9abbde",
+          "contentHash": "240694ba454fe350368aa794",
           "documentId": "support-hours",
           "projectId": "fictional-narkis",
           "sentenceIndex": 0,
           "sourceUri": "fixture://narkis/support-hours",
-          "title": "שעות תמיכה"
+          "title": "Support hours policy"
         },
         "query_coverage": 1.0,
         "source_uri": "fixture://narkis/support-hours",
-        "title": "שעות תמיכה"
+        "title": "Support hours policy"
       }
     ],
     "status": "sources_found",
-    "title": "שאלה עם מקור מורשה"
+    "title": "Question with an eligible source"
   },
   {
     "case_id": "insufficient",
@@ -57,14 +57,14 @@
       "calls": 0,
       "configured": false
     },
-    "question": "מה תחזית מזג האוויר בחיפה מחר?",
+    "question": "What is the weather forecast for Haifa tomorrow?",
     "retrieval": {
       "candidates_considered": 4,
       "engine": "NESTRA lexical project memory"
     },
     "sources": [],
     "status": "no_evidence",
-    "title": "שאלה ללא ראיות"
+    "title": "Question without evidence"
   },
   {
     "case_id": "untrusted",
@@ -82,14 +82,14 @@
       "calls": 0,
       "configured": false
     },
-    "question": "מה תקרת ההחזר לציוד בצוות נרקיס?",
+    "question": "What is the equipment reimbursement limit for team Narkis?",
     "retrieval": {
       "candidates_considered": 4,
       "engine": "NESTRA lexical project memory"
     },
     "sources": [],
     "status": "blocked",
-    "title": "מקור שאינו מהימן"
+    "title": "Matching source is untrusted"
   },
   {
     "case_id": "restricted",
@@ -107,13 +107,13 @@
       "calls": 0,
       "configured": false
     },
-    "question": "מי מחזיקי הרשאת חדר ניסוי בצוות נרקיס?",
+    "question": "Who holds laboratory room access for team Narkis?",
     "retrieval": {
       "candidates_considered": 4,
       "engine": "NESTRA lexical project memory"
     },
     "sources": [],
     "status": "blocked",
-    "title": "מקור שאסור להצגה במדיניות הדמו"
+    "title": "Matching source is restricted by showcase policy"
   }
 ]

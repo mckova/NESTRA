@@ -1,30 +1,30 @@
-NESTRA — הדגמת שליפה ומדיניות מקומית
-כל הנהלים והצוותים מומצאים. אין מודל שפה פעיל ואין קריאות ספק.
-התצוגה מחזירה קטעי מקור בלבד; התאמת מילים אינה הוכחת נכונות או שלמות.
+NESTRA - offline source retrieval and policy showcase
+All policies and records are fictional. No model provider is configured.
+Only source excerpts are returned; lexical coverage does not establish truth or completeness.
 
-[supported] שאלה עם מקור מורשה
-שאלה: מה שעות התמיכה בצוות נרקיס?
-תוצאה: נמצאו מקורות מורשים — לא נוצרה תשובת מודל
-מדיניות: נמצא קטע מורשה המתאים למונחי השאלה (eligible_source_matches)
-מקור: שעות תמיכה | fixture://narkis/support-hours
-קטע: שעות התמיכה בצוות נרקיס הן בימים ראשון עד חמישי, בין 18:00 ל־21:00.
-מזהה ראיה: fact-72caaa105d055a9b
+[supported] Question with an eligible source
+Question: What are the support hours for team Narkis?
+Outcome: Eligible sources found - excerpts, not a generated answer
+Policy: An eligible source meets the lexical coverage rule (eligible_source_matches)
+Source: Support hours policy | fixture://narkis/support-hours
+Excerpt: The support hours for team Narkis are Sunday through Thursday from 18:00 to 21:00.
+Source identifier: fact-e3a73c97e09a4ecb
 Provider: not configured | calls: 0
 
-[insufficient] שאלה ללא ראיות
-שאלה: מה תחזית מזג האוויר בחיפה מחר?
-תוצאה: אין ראיות מספקות לפי כלל ההתאמה של הדמו
-מדיניות: אין קטע המכסה את מונחי השאלה לפי כלל הדמו (insufficient_lexical_coverage)
+[insufficient] Question without evidence
+Question: What is the weather forecast for Haifa tomorrow?
+Outcome: Insufficient evidence - no answer is generated
+Policy: No source excerpt meets the configured lexical coverage rule (insufficient_lexical_coverage)
 Provider: not configured | calls: 0
 
-[untrusted] מקור שאינו מהימן
-שאלה: מה תקרת ההחזר לציוד בצוות נרקיס?
-תוצאה: חסום במדיניות הדמו — תוכן המקור אינו מוצג
-מדיניות: המקור לא סומן כמהימן (untrusted_source)
+[untrusted] Matching source is untrusted
+Question: What is the equipment reimbursement limit for team Narkis?
+Outcome: Blocked by showcase policy - source content is withheld
+Policy: The matching source is not marked trusted (untrusted_source)
 Provider: not configured | calls: 0
 
-[restricted] מקור שאסור להצגה במדיניות הדמו
-שאלה: מי מחזיקי הרשאת חדר ניסוי בצוות נרקיס?
-תוצאה: חסום במדיניות הדמו — תוכן המקור אינו מוצג
-מדיניות: רגישות המקור גבוהה מהמותר בדמו (sensitive_source)
+[restricted] Matching source is restricted by showcase policy
+Question: Who holds laboratory room access for team Narkis?
+Outcome: Blocked by showcase policy - source content is withheld
+Policy: The matching source exceeds the showcase sensitivity limit (sensitive_source)
 Provider: not configured | calls: 0

@@ -1,48 +1,51 @@
-# תוכנית עבודה לתצוגת NESTRA מקומית
+# Work plan for the NESTRA offline showcase
 
-## יעד וגבולות
+## Goal and boundaries
 
-דמו CLI דטרמיניסטי בעברית, המבוסס על subset שנבדק מתוך NESTRA ועל נהלים מומצאים בלבד. הדמו מציג שליפה עם מקורות, היעדר ראיות וחסימת מקור לא מהימן או רגיש. אין ספק מודל, תשלום, מפתח, רשת או פרסום. אין שינוי במקור.
+A deterministic English CLI demonstration based on a reviewed subset of NESTRA and invented team procedures. It shows source-backed retrieval, insufficient evidence, and blocking of untrusted or sensitivity-restricted sources. No model provider, paid service, API key, network call or source-checkout dependency exists in the demo path.
 
-מקור לקריאה בלבד: תיקיית NESTRA המקומית מחוץ לעץ התצוגה. נתיב המקור וראיות ההשוואה נשמרים בתיקיית הביקורת הפרטית, ואינם דרושים להרצת הדמו.
+This plan records the initial extraction and the later English correction. The correction applies to authored documentation, wrapper, fixtures, CLI help/output and tests. Multilingual regular-expression patterns in the inherited core are algorithm data retained verbatim. The copied core and license are not translated or reassigned.
 
-תוצר: תיקיית `nestra-showcase` החדשה בתיקיית המשימה. ראיות ביקורת מקומיות נשמרות בנפרד ב־`nestra-showcase-review` ואינן חלק מחבילת התצוגה.
+The original source checkout stays read only and outside this artifact. Its local path and comparison evidence belong to a private review directory and are not required to run the demo. The staged artifact is under `examples/showcase`; private review evidence is not part of that package.
 
-## שלבים ובעלי אחריות
+## Stages and responsibilities
 
-| שלב | אחראי | תלות | קריטריון קבלה | מצב סופי |
+| Stage | Owner | Dependency | Acceptance criterion | Status |
 |---|---|---|---|---|
-| בדיקת הקוד וצילום מצב מקור | הסוכן הראשי | הרשאות קריאה קיימות | רשימת קבצים מפורשת; AST/import review; metadata של המקור ו־SHA256 לקבצים שנבחרו | בוצע |
-| חילוץ subset מבודד | הסוכן הראשי | בדיקת הקוד | רק LICENSE ושלושה מודולי core מועתקים; hashes וייחוס שמורים; בלי package initializer המקורי וספקי רשת | בוצע |
-| דמו ונתונים מומצאים | showcase_demo | subset מבודד | ארבעה תרחישים; אין טקסט חסום בפלט; ספק אינו מוגדר; פלט עברי ו־JSON | בוצע ונבדק |
-| תיעוד | showcase_docs | ממשק דמו מוסכם | README עברי ואנגלי, ארכיטקטורה, מגבלות ו־NOTICE; הוראות ללא התקנה | בוצע |
-| בדיקות עצמאיות | showcase_tests | חוזה ממשק, ולאחר מכן מימוש | בדיקות התנהגות, דטרמיניזם, provenance, רגישות וגבול offline | 23 בדיקות עברו |
-| סקירה והרצה מבוקרת | הסוכן הראשי | קוד ותיעוד מוכנים | קריאת הקוד החדש לפני הרצה; בדיקות עדכניות; דמו text/JSON תואם | בוצע; גם הרצה עצמאית של 23 בדיקות עברה |
-| פלט לדוגמה ובדיקת מקור חוזרת | הסוכן הראשי | הרצה מוצלחת | דוגמה עדכנית; hashes ומטא־דאטה מקור ללא שינוי; רשימת תוצרים | בוצע; המקור ללא שינוי בטווח ההשוואה |
+| Source review and baseline | Integration reviewer | Existing read access | Explicit allowlist, AST/import review, source metadata and selected SHA-256 hashes | Completed during initial extraction; scope recorded in validation report |
+| Isolated source subset | Integration reviewer | Source review | Original license and three core modules copied verbatim; no broad upstream initializer or providers | Completed during initial extraction |
+| Demo and invented data | Demo agent | Isolated subset | Four cases, blocked evidence withheld, no provider, deterministic English text and JSON | English correction passed the standalone suite; actual English samples captured |
+| Documentation | Documentation agent | Agreed interface | English README, architecture, limits, plan and notice; no installation required | Completed; six owned documents passed the English-script check |
+| Independent checks | Test agent | Interface and implementation | Behavior, determinism, provenance, disclosure and offline checks | Corrected staged revision: 23 tests passed |
+| Integration review | Integration reviewer | Code, docs and checks | Review changes, run current checks and compare captured output | Corrected stage: 23 tests and complete showcase Ruff checks passed; samples matched |
+| Samples and artifact review | Integration reviewer | Successful current checks | Actual English CLI samples, copied-file integrity and bounded artifact inventory | Completed: 22 selected files, English authored content, valid links and unchanged copied-file hashes |
 
-## רשימת ההעתקה
+Historical passing results do not establish acceptance of a later revision. Current staged results belong in [VALIDATION.md](VALIDATION.md).
 
-- `LICENSE` נשמר במדויק, לרבות ייחוס Agent Hive Contributors.
-- `src/nestra/project_memory.py` אל `src/nestra_core/project_memory.py`.
-- `src/nestra/memory.py` אל `src/nestra_core/memory.py`.
-- `src/nestra/security.py` אל `src/nestra_core/security.py`.
+## Explicit copy allowlist
 
-שלושת המודולים נקראו ונבדקו לפני הרצה. תלותם היא בספרייה התקנית וביניהם בלבד. אין בהם קריאות filesystem, shell או network שזוהו בסקירת ה־AST. ה־initializer של חבילת המקור אינו מועתק, כדי שלא לטעון server, provider או integrations שאינם דרושים.
+- `LICENSE`, unchanged, including the Agent Hive Contributors notice.
+- `src/nestra/project_memory.py` to `src/nestra_core/project_memory.py`.
+- `src/nestra/memory.py` to `src/nestra_core/memory.py`.
+- `src/nestra/security.py` to `src/nestra_core/security.py`.
 
-`PROVENANCE.json` מכיל מיפוי ו־SHA256. לא הועתקו `.git`, קובצי סביבה, סודות, caches, logs, מאגרי משתמשים, benchmarks או תשובות ספקים. ה־showcase מוסיף wrappers, fixtures ובדיקות חדשים, ואינו מציג עצמו כמימוש מלא של upstream.
+The selected modules were inspected before their initial execution. Their dependencies are standard-library or local imports. No filesystem, shell or network operations were identified in the reviewed core AST. The broad original package initializer is excluded, avoiding unrelated server, provider and integration imports.
 
-## קריטריוני המוצר הראשון
+`PROVENANCE.json` records the selected paths and SHA-256 digests. No `.git`, credentials, user data, caches, logs, private review evidence, benchmarks or provider responses are copied. New wrappers, invented fixtures, launchers and tests belong to the showcase rather than the upstream runtime.
 
-1. פקודה אחת מריצה דמו מובנה ללא התקנת חבילות וללא רשת.
-2. נהלים ושאלות בעברית; המקורות פיקטיביים ומסומנים כך.
-3. תוצאה נתמכת מציגה קטע מקור ו־provenance, לא תשובת LLM מומצאת.
-4. שאלה ללא ראיות אינה מציגה מקורות לא רלוונטיים כהצלחה.
-5. מקור חסום אינו חושף את תוכנו או פרטי מקור מוגבלים בפלט.
-6. JSON חוזר באופן דטרמיניסטי; clock מקובע ואין latency משתנה בדוח הדמו.
-7. retrieval, מדיניות הדמו והיעדר provider מופיעים בנפרד.
-8. אין טענת חיסכון בטוקנים, איכות מודל או אמינות סמנטית כללית.
-9. בדיקת המקור נעשית בלי Git ובלי קריאת תוכן קובצי סודות.
+## Acceptance criteria
 
-## בדיקות וקבלה סופית
+1. One command runs the demo with an existing interpreter, without installation or network access.
+2. Procedures, questions, help and output are English and use invented data only.
+3. The supported case displays a source excerpt with provenance, not an LLM-generated answer.
+4. The insufficient-evidence case does not report irrelevant sources as success.
+5. Blocked cases expose no source excerpts, identifiers, titles or references.
+6. JSON and text are deterministic. A fixed fixture clock is not presented as a live audit timestamp or measured latency.
+7. Retrieval, showcase policy and the absence of a provider are clearly separated.
+8. No model-quality, token-saving, semantic-reliability or production-security claims are inferred from the demo.
+9. Copied-file digests and the original license remain unchanged.
+10. Authored docs, fixtures, help/output and tests contain no Hebrew script. Inherited multilingual regex algorithm data stays verbatim outside that translation boundary.
 
-ראו [דוח האימות](VALIDATION.md) לפקודות, תוצאות ומגבלות. כל קריטריוני המוצר הראשון נבדקו במסגרת הבדיקות והסקירה. כל פרסום, העלאה, פתיחת מאגר או שינוי הרשאות נשאר מחוץ לתחום.
+## Verification and release boundary
+
+The [validation record](VALIDATION.md) records commands, observed results and their limits. The corrected staged revision passed its standalone suite, local integration checks and release-file review. Repository-wide CI status is recorded by GitHub Actions for the published commit. The demo performs no Git, network or installation operation and never modifies the original source checkout.

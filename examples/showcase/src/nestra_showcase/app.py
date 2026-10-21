@@ -20,17 +20,57 @@ from nestra_core.security import detect_prompt_injection, sanitize_user_text
 from .fixtures import CASE_IDS, CASES, get_documents
 
 FIXED_TIME = datetime(2026, 10, 21, tzinfo=timezone.utc)
+# Function words are excluded only from the showcase's exact lexical coverage.
+# Preserve the original Hebrew question words as escapes for existing callers.
 _QUESTION_WORDS = frozenset(
-    {"מה", "מי", "מתי", "איפה", "היכן", "איך", "כיצד", "האם", "של", "את", "על"}
+    {
+        "what",
+        "who",
+        "when",
+        "where",
+        "how",
+        "why",
+        "which",
+        "is",
+        "are",
+        "was",
+        "were",
+        "the",
+        "a",
+        "an",
+        "for",
+        "of",
+        "to",
+        "in",
+        "on",
+        "at",
+        "by",
+        "with",
+        "does",
+        "do",
+        "can",
+        "should",
+        "\u05de\u05d4",
+        "\u05de\u05d9",
+        "\u05de\u05ea\u05d9",
+        "\u05d0\u05d9\u05e4\u05d4",
+        "\u05d4\u05d9\u05db\u05df",
+        "\u05d0\u05d9\u05da",
+        "\u05db\u05d9\u05e6\u05d3",
+        "\u05d4\u05d0\u05dd",
+        "\u05e9\u05dc",
+        "\u05d0\u05ea",
+        "\u05e2\u05dc",
+    }
 )
 _REASON_LABELS = {
-    "eligible_source_matches": "נמצא קטע מורשה המתאים למונחי השאלה",
-    "insufficient_lexical_coverage": "אין קטע המכסה את מונחי השאלה לפי כלל הדמו",
-    "no_informative_terms": "אין בשאלה מונחי תוכן לבדיקה",
-    "untrusted_source": "המקור לא סומן כמהימן",
-    "sensitive_source": "רגישות המקור גבוהה מהמותר בדמו",
-    "source_instruction_pattern": "נמצא במקור דפוס הוראות שאינו ראיה",
-    "question_instruction_pattern": "השאלה כוללת דפוס הוראות שנחסם בדמו",
+    "eligible_source_matches": "An eligible source meets the lexical coverage rule",
+    "insufficient_lexical_coverage": "No source excerpt meets the configured lexical coverage rule",
+    "no_informative_terms": "The question contains no informative retrieval terms",
+    "untrusted_source": "The matching source is not marked trusted",
+    "sensitive_source": "The matching source exceeds the showcase sensitivity limit",
+    "source_instruction_pattern": "An instruction-like pattern was detected in the source",
+    "question_instruction_pattern": "An instruction-like pattern was detected in the question",
 }
 
 
@@ -71,7 +111,10 @@ def evaluate_question(
         "question": query,
         "status": "no_evidence",
         "policy": policy,
-        "retrieval": {"engine": "NESTRA lexical project memory", "candidates_considered": 0},
+        "retrieval": {
+            "engine": "NESTRA lexical project memory",
+            "candidates_considered": 0,
+        },
         "sources": [],
         "provider": {"configured": False, "calls": 0},
         "generated_answer": None,
@@ -133,7 +176,11 @@ def evaluate_question(
         return result
 
     eligible.sort(
-        key=lambda row: (-row[0]["retrievalScore"], row[0]["documentId"], row[0]["factId"])
+        key=lambda row: (
+            -row[0]["retrievalScore"],
+            row[0]["documentId"],
+            row[0]["factId"],
+        )
     )
     result["status"] = "sources_found"
     policy["reason_codes"] = ["eligible_source_matches"]
@@ -167,34 +214,34 @@ def run_demo() -> list[dict[str, Any]]:
     return [run_case(case_id) for case_id in CASE_IDS]
 
 
-def _render_hebrew(results: list[dict[str, Any]]) -> str:
+def _render_text(results: list[dict[str, Any]]) -> str:
     lines = [
-        "NESTRA — הדגמת שליפה ומדיניות מקומית",
-        "כל הנהלים והצוותים מומצאים. אין מודל שפה פעיל ואין קריאות ספק.",
-        "התצוגה מחזירה קטעי מקור בלבד; התאמת מילים אינה הוכחת נכונות או שלמות.",
+        "NESTRA - offline source retrieval and policy showcase",
+        "All policies and records are fictional. No model provider is configured.",
+        "Only source excerpts are returned; lexical coverage does not establish truth or completeness.",
     ]
     status_labels = {
-        "sources_found": "נמצאו מקורות מורשים — לא נוצרה תשובת מודל",
-        "no_evidence": "אין ראיות מספקות לפי כלל ההתאמה של הדמו",
-        "blocked": "חסום במדיניות הדמו — תוכן המקור אינו מוצג",
+        "sources_found": "Eligible sources found - excerpts, not a generated answer",
+        "no_evidence": "Insufficient evidence - no answer is generated",
+        "blocked": "Blocked by showcase policy - source content is withheld",
     }
     for result in results:
         lines.extend(
             [
                 "",
                 f"[{result['case_id']}] {result['title']}",
-                f"שאלה: {result['question']}",
-                f"תוצאה: {status_labels[result['status']]}",
+                f"Question: {result['question']}",
+                f"Outcome: {status_labels[result['status']]}",
             ]
         )
         for code in result["policy"]["reason_codes"]:
-            lines.append(f"מדיניות: {_REASON_LABELS[code]} ({code})")
+            lines.append(f"Policy: {_REASON_LABELS[code]} ({code})")
         for source in result["sources"]:
             lines.extend(
                 [
-                    f"מקור: {source['title']} | {source['source_uri']}",
-                    f"קטע: {source['excerpt']}",
-                    f"מזהה ראיה: {source['id']}",
+                    f"Source: {source['title']} | {source['source_uri']}",
+                    f"Excerpt: {source['excerpt']}",
+                    f"Source identifier: {source['id']}",
                 ]
             )
         lines.append("Provider: not configured | calls: 0")
@@ -202,9 +249,11 @@ def _render_hebrew(results: list[dict[str, Any]]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="דמו NESTRA מקומי על נהלים מומצאים בלבד")
-    parser.add_argument("--json", action="store_true", help="פלט JSON דטרמיניסטי")
-    parser.add_argument("--case", choices=CASE_IDS, help="הצגת מקרה אחד במקום כל ארבעת המקרים")
+    parser = argparse.ArgumentParser(
+        description="Offline NESTRA showcase using fictional team policies only"
+    )
+    parser.add_argument("--json", action="store_true", help="Print deterministic JSON")
+    parser.add_argument("--case", choices=CASE_IDS, help="Run one named case instead of all four")
     args = parser.parse_args(argv)
     results = [run_case(args.case)] if args.case else run_demo()
     if hasattr(sys.stdout, "reconfigure"):
@@ -212,5 +261,5 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(results, ensure_ascii=False, indent=2, sort_keys=True))
     else:
-        print(_render_hebrew(results))
+        print(_render_text(results))
     return 0
